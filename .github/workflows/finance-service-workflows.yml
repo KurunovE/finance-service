@@ -85,7 +85,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /opt/course-service
+            cd /opt/finance-service
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin 
             docker pull ${{ env.IMAGE_NAME }}:latest
             docker compose down
