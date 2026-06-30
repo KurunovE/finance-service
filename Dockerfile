@@ -2,7 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
 COPY pom.xml ./pom.xml
 COPY src ./src
-RUN mvn clean pakage -DskipTests
+RUN mvn clean paсkage -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 COPY --from=builder /app/target/*.jar app.jar
