@@ -17,8 +17,8 @@ import java.util.UUID;
 @Table(name = "savings")
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class SavingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
