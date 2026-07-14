@@ -1,10 +1,10 @@
-package com.prorenta.cashflow;
+package com.prorenta.financeservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CashFlowApplicationTests {
+class FinanceServiceApplicationTests {
 
     @Test
     void contextLoads() {

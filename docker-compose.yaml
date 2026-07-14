@@ -12,7 +12,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d finance_db"]
+      test: ["CMD-SHELL", "pg_isready -U user -d finance_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +30,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql//postgres:5432/finance_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finance_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: admin_password_1
     ports:
