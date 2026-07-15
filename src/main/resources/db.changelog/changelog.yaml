@@ -36,10 +36,10 @@ databaseChangeLog:
         endDelimiter: ;
 
   - changeSet:
-      id: 26_07_06_v1_create_table_savings.sql
+      id: 26_07_06_v1_create_table_deposits.sql
       author: Egor Kurunov
       sqlFile:
-        path: dbscripts/26_07_06_v1_create_table_savings.sql
+        path: dbscripts/26_07_06_v1_create_table_deposits.sql
         relativeToChangelogFile: true
         splitStatements: true
         endDelimiter: ;
@@ -49,24 +49,6 @@ databaseChangeLog:
       author: Egor Kurunov
       sqlFile:
         path: dbscripts/26_07_08_create_table_loans.sql
-        relativeToChangelogFile: true
-        splitStatements: true
-        endDelimiter: ;
-
-  - changeSet:
-      id: 26_07_08_create_table_portfolios.sql
-      author: Egor Kurunov
-      sqlFile:
-        path: dbscripts/26_07_08_create_table_portfolios.sql
-        relativeToChangelogFile: true
-        splitStatements: true
-        endDelimiter: ;
-
-  - changeSet:
-      id: 26_07_08_create_table_brokers.sql
-      author: Egor Kurunov
-      sqlFile:
-        path: dbscripts/26_07_08_create_table_brokers.sql
         relativeToChangelogFile: true
         splitStatements: true
         endDelimiter: ;

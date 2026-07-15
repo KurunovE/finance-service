@@ -1,10 +1,13 @@
 CREATE TABLE loans
 (
-    account_id       UUID PRIMARY KEY REFERENCES accounts (id) ON DELETE CASCADE,
-    interest_rate    NUMERIC(5, 2)  NOT NULL DEFAULT 0.00,
-    initial_amount   NUMERIC(15, 2) NOT NULL CHECK (initial_amount > 0),
-    remaining_amount NUMERIC(15, 2) NOT NULL,
+    id            UUID PRIMARY KEY,
+    user_id       UUID           NOT NULL,
+    name          VARCHAR(30),
+    init_amount   DECIMAL(15, 2) NOT NULL,
+    currency_id   UUID           NOT NULL,
+    interest_rate DECIMAL(5, 2)  NOT NULL,
+    paid          DECIMAL(15, 2)           DEFAULT 0.00,
+    created_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT chk_remaining_amount
-        CHECK (remaining_amount >= 0 AND remaining_amount <= initial_amount)
+    FOREIGN KEY (currency_id) REFERENCES currencies (id),
 );
