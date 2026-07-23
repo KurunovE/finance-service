@@ -44,4 +44,5 @@ public class Transaction {
 
     @Column(name = "created_date", nullable = false)
     private LocalDate createdDate;
+
 }
