@@ -2,10 +2,7 @@ package com.prorenta.financeservice.model.entity;
 
 import com.prorenta.financeservice.model.enums.CategoryType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Table(name = "categories")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {

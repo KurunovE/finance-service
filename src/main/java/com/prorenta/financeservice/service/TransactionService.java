@@ -6,11 +6,11 @@ import java.util.UUID;
 
 public interface TransactionService {
 
-    TransactionResponseDto createTransaction(CreateTransactionRequestDto request);
+    TransactionResponseDto createTransaction(CreateTransactionRequestDto dto);
 
-    FilterTransactionsResponseDto getTransactions(FilterTransactionRequestDto request);
+    FilterTransactionsResponseDto getTransactions(FilterTransactionRequestDto dto);
 
-    TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto request);
+    TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto dto);
 
     void removeTransaction(UUID transactionId);
 }
