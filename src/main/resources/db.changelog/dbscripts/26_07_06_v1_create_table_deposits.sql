@@ -9,5 +9,5 @@ CREATE TABLE deposits
     created_at    TIMESTAMP WITH TIME ZONE NOT NULL,
     completion_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    FOREIGN KEY (currency_id) REFERENCES currencies (id),
+    FOREIGN KEY (currency_id) REFERENCES currencies (id)
 );

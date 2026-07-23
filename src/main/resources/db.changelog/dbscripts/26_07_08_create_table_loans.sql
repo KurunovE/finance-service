@@ -9,5 +9,5 @@ CREATE TABLE loans
     paid          DECIMAL(15, 2)           DEFAULT 0.00,
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (currency_id) REFERENCES currencies (id),
+    FOREIGN KEY (currency_id) REFERENCES currencies (id)
 );
