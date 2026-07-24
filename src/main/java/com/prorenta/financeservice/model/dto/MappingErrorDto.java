@@ -4,11 +4,13 @@ import lombok.Builder;
 import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 @Builder
-public record ErrorDto(
+public record MappingErrorDto(
         HttpStatus status,
         String message,
-        ZonedDateTime zonedDateTime
+        ZonedDateTime zonedDateTime,
+        Map<String, String> details
 ) {
 }

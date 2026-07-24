@@ -10,27 +10,30 @@ import com.prorenta.financeservice.service.CategoryService;
 import com.prorenta.financeservice.service.CurrencyService;
 import com.prorenta.financeservice.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
     private final CategoryService categoryService;
     private final CurrencyService currencyService;
-
     private final TransactionRepository transactionRepository;
-
     private final TransactionMapper transactionMapper;
 
     @Override
     public TransactionResponseDto createTransaction(CreateTransactionRequestDto dto) {
-        UserInfoDto user = new UserInfoDto(dto.userId(), "Name");
+        log.info("Инициализация создания транзакции: userId={}", dto.userId());
 
-        Category category = null;
-        Currency currency = null;
+        UserInfoDto user = new UserInfoDto(dto.userId(), "Name");
+        Category category = categoryService.findById(dto.categoryId());
+        Currency currency = currencyService.findById(dto.currencyId());
+
+        log.debug("Связанные сущности загружены: categoryId={}, currencyId={}", category.getId(), currency.getId());
 
         Transaction transaction = Transaction.builder()
                 .userId(user.id())
@@ -43,6 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
+        log.info("Транзакция успешно сохранена: transactionId={}", saved.getId());
 
         return transactionMapper.mapTransactionToTransactionResponseDto(saved);
     }
