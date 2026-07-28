@@ -1,5 +1,6 @@
 package com.prorenta.financeservice.service.impl;
 
+import com.prorenta.financeservice.exception.TransactionNotFoundException;
 import com.prorenta.financeservice.mapper.TransactionMapper;
 import com.prorenta.financeservice.model.dto.*;
 import com.prorenta.financeservice.model.entity.Category;
@@ -11,7 +12,11 @@ import com.prorenta.financeservice.service.CurrencyService;
 import com.prorenta.financeservice.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -26,6 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
 
     @Override
+    @Transactional
     public TransactionResponseDto createTransaction(CreateTransactionRequestDto dto) {
         log.info("Инициализация создания транзакции: userId={}", dto.userId());
 
@@ -45,24 +51,59 @@ public class TransactionServiceImpl implements TransactionService {
                 .createdDate(dto.createdDate())
                 .build();
 
-        Transaction saved = transactionRepository.save(transaction);
-        log.info("Транзакция успешно сохранена: transactionId={}", saved.getId());
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        log.info("Транзакция успешно сохранена: transactionId={}", savedTransaction.getId());
 
-        return transactionMapper.mapTransactionToTransactionResponseDto(saved);
+        return transactionMapper.mapTransactionToTransactionResponseDto(savedTransaction);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FilterTransactionsResponseDto getTransactions(FilterTransactionRequestDto dto) {
+        // TODO: пользователь получает только свои транзакции. Нужен JWT token
         return null;
     }
 
     @Override
+    @Transactional
     public TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto dto) {
-        return null;
+        log.info("Инициализация обновления транзакции: transactionId={}", transactionId);
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
+                () -> new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена")
+        );
+        if (dto.categoryId() != null) {
+            Category category = categoryService.findById(dto.categoryId());
+            log.debug("Загружена категория: categoryId={}", category.getId());
+            transaction.setCategory(category);
+        }
+        if (dto.currencyId() != null) {
+            Currency currency = currencyService.findById(dto.currencyId());
+            log.debug("Загружена валюта: currencyId={}", currency.getId());
+            transaction.setCurrency(currency);
+        }
+        if (dto.amount() != null) {
+            transaction.setAmount(dto.amount());
+        }
+        if (dto.bank() != null) {
+            transaction.setBank(dto.bank());
+        }
+        if (dto.description() != null) {
+            transaction.setDescription(dto.description());
+        }
+        if (dto.createdDate() != null) {
+            transaction.setCreatedDate(dto.createdDate());
+        }
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        log.info("Транзакция успешно обновлена: transactionId={}", savedTransaction.getId());
+
+        return transactionMapper.mapTransactionToTransactionResponseDto(savedTransaction);
     }
 
     @Override
-    public void removeTransaction(UUID transactionId) {
-
+    @Transactional
+    public void softRemoveTransaction(UUID transactionId) {
+        log.info("Инициализация удаления транзакции: transactionId={}", transactionId);
+        transactionRepository.softRemoveTransaction(transactionId);
+        log.info("Успешное удаление транзакции: transactionId={}", transactionId);
     }
 }

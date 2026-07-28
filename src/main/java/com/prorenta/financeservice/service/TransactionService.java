@@ -12,5 +12,5 @@ public interface TransactionService {
 
     TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto dto);
 
-    void removeTransaction(UUID transactionId);
+    void softRemoveTransaction(UUID transactionId);
 }

@@ -20,9 +20,8 @@ public class TransactionControllerImpl implements TransactionController {
 
     @Override
     public ResponseEntity<TransactionResponseDto> createTransaction(CreateTransactionRequestDto request) {
-        log.info("Запрос на создание транзакции: userId={}", request.userId());
+        log.debug("Запрос на создание транзакции: userId={}", request.userId());
         TransactionResponseDto createdTransaction = transactionService.createTransaction(request);
-        log.info("Транзакция успешно создана: transactionId={}, userId={}", createdTransaction.id(), request.userId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
     }
 
@@ -35,17 +34,15 @@ public class TransactionControllerImpl implements TransactionController {
 
     @Override
     public ResponseEntity<TransactionResponseDto> updateTransaction(UUID transactionId, UpdateTransactionRequestDto request) {
-        log.info("Запрос на обновление транзакции: transactionId={}", transactionId);
+        log.debug("Запрос на обновление транзакции: transactionId={}", transactionId);
         TransactionResponseDto updatedTransaction = transactionService.updateTransaction(transactionId, request);
-        log.info("Транзакция успешно обновлена: transactionId={}", transactionId);
         return ResponseEntity.ok(updatedTransaction);
     }
 
     @Override
-    public ResponseEntity<Void> removeTransaction(UUID transactionId) {
-        log.info("Запрос на удаление транзакции: transactionId={}", transactionId);
-        transactionService.removeTransaction(transactionId);
-        log.info("Транзакция успешно удалена: transactionId={}", transactionId);
+    public ResponseEntity<Void> softRemoveTransaction(UUID transactionId) {
+        log.debug("Запрос на удаление транзакции: transactionId={}", transactionId);
+        transactionService.softRemoveTransaction(transactionId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -152,17 +152,9 @@ public interface TransactionController {
             @ApiResponse(
                     responseCode = "204",
                     description = "Транзакция успешно удалена"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Транзакция не найдена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorDto.class)
-                    )
             )
     })
-    ResponseEntity<Void> removeTransaction(
+    ResponseEntity<Void> softRemoveTransaction(
             @Parameter(description = "ID транзакции", required = true)
             @PathVariable("id") UUID transactionId
     );

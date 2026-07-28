@@ -28,11 +28,11 @@ public class Transaction {
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "currency_id", nullable = false, updatable = false)
+    @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
 
     @Column(name = "amount", nullable = false)
-    private BigDecimal amount;
+    private BigDecimal amount = BigDecimal.ZERO;
 
     @Column(name = "bank")
     private String bank;
@@ -42,5 +42,9 @@ public class Transaction {
 
     @Column(name = "created_date", nullable = false)
     private LocalDate createdDate;
+
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
 }

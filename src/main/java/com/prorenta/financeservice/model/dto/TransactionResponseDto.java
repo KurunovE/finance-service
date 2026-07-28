@@ -9,7 +9,7 @@ import java.util.UUID;
 @Builder
 public record TransactionResponseDto(
         UUID id,
-        String category,
+        String categoryName,
         String currencyCode,
         BigDecimal amount,
         String bank,
