@@ -64,6 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public FilterTransactionsResponseDto getTransactions(FilterTransactionRequestDto dto) {
         log.debug("Получение списка транзакций: filters={}", dto);
+
         Pageable pageable = PageRequest.of(
                 dto.page(),
                 dto.pageSize(),
@@ -71,7 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         Specification<Transaction> specification = TransactionFilterSpecification.buildFilter(
-                dto.categoryId(),
+                dto.categoryName(),
                 dto.startCreatedDate(),
                 dto.endCreatedDate()
         );

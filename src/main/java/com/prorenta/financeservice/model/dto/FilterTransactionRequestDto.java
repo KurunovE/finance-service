@@ -4,10 +4,9 @@ import jakarta.validation.constraints.AssertTrue;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.UUID;
 
 public record FilterTransactionRequestDto(
-        UUID categoryId,
+        String categoryName,
         LocalDate startCreatedDate,
         LocalDate endCreatedDate,
         Integer page,
