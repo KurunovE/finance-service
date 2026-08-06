@@ -1,11 +1,13 @@
 package com.prorenta.financeservice.model.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Builder
 public record CreateTransactionRequestDto(
 
         @NotNull(message = "userId обязателен")

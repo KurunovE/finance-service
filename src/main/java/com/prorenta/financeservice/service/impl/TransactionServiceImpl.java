@@ -10,11 +10,14 @@ import com.prorenta.financeservice.repository.TransactionRepository;
 import com.prorenta.financeservice.service.CategoryService;
 import com.prorenta.financeservice.service.CurrencyService;
 import com.prorenta.financeservice.service.TransactionService;
+import com.prorenta.financeservice.util.TransactionFilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public TransactionResponseDto createTransaction(CreateTransactionRequestDto dto) {
-        log.info("Инициализация создания транзакции: userId={}", dto.userId());
+        log.info("Создание транзакции: userId={}", dto.userId());
 
         UserInfoDto user = new UserInfoDto(dto.userId(), "Name");
         Category category = categoryService.findById(dto.categoryId());
@@ -60,14 +63,40 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public FilterTransactionsResponseDto getTransactions(FilterTransactionRequestDto dto) {
-        // TODO: пользователь получает только свои транзакции. Нужен JWT token
-        return null;
+        log.debug("Получение списка транзакций: filters={}", dto);
+        Pageable pageable = PageRequest.of(
+                dto.page(),
+                dto.pageSize(),
+                Sort.by(Sort.Direction.fromString(dto.sortDirection()), dto.fieldSort())
+        );
+
+        Specification<Transaction> specification = TransactionFilterSpecification.buildFilter(
+                dto.categoryId(),
+                dto.startCreatedDate(),
+                dto.endCreatedDate()
+        );
+
+        Page<Transaction> response = transactionRepository.findAll(specification, pageable);
+        log.debug("Найдено {} транзакций. {} страница из {}",
+                response.getTotalElements(), response.getNumber(), response.getTotalPages());
+
+        return FilterTransactionsResponseDto.builder()
+                .transactions(
+                        response.getContent().stream()
+                                .map(transactionMapper::mapTransactionToTransactionResponseDto)
+                                .toList()
+                )
+                .pageNumber(response.getPageable().getPageNumber())
+                .elementToPage(response.getPageable().getPageSize())
+                .countPage(response.getTotalPages())
+                .countTransactions(response.getTotalElements())
+                .build();
     }
 
     @Override
     @Transactional
     public TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto dto) {
-        log.info("Инициализация обновления транзакции: transactionId={}", transactionId);
+        log.info("Обновление транзакции: transactionId={}", transactionId);
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
                 () -> new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена")
         );
@@ -102,7 +131,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void softRemoveTransaction(UUID transactionId) {
-        log.info("Инициализация удаления транзакции: transactionId={}", transactionId);
+        log.info("Удаление транзакции: transactionId={}", transactionId);
         transactionRepository.softRemoveTransaction(transactionId);
         log.info("Успешное удаление транзакции: transactionId={}", transactionId);
     }

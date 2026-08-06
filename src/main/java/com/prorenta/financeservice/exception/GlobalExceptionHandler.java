@@ -41,6 +41,7 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        log.warn("Ошибка валидации входящего запроса: {}", errors);
 
         MappingErrorDto errorDto = MappingErrorDto.builder()
                 .status(HttpStatus.BAD_REQUEST)
@@ -53,7 +54,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleAllUnhandledExceptions(Exception ex) {
-        log.error("Внутренняя ошибка сервера: ", ex);
+        log.error("Внутренняя ошибка сервера: {}", ex.getMessage(), ex);
         ErrorDto errorDto = ErrorDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .message("Произошла непредвиденная ошибка")
