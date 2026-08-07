@@ -7,6 +7,7 @@ import com.prorenta.financeservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     private final CurrencyRepository currencyRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Currency findById(UUID id) {
         return currencyRepository.findById(id).orElseThrow(
                 () -> new CurrencyNotFoundException("Валюта с id=" + id + " не найдена")

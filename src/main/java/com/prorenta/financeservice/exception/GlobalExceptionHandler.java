@@ -2,6 +2,8 @@ package com.prorenta.financeservice.exception;
 
 import com.prorenta.financeservice.model.dto.ErrorDto;
 import com.prorenta.financeservice.model.dto.MappingErrorDto;
+import feign.FeignException;
+import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             CategoryNotFoundException.class,
             CurrencyNotFoundException.class,
-            TransactionNotFoundException.class
+            TransactionNotFoundException.class,
+            FeignException.NotFound.class,
+            UserNotFoundException.class
     })
     public ResponseEntity<ErrorDto> handleNotFoundException(RuntimeException ex) {
         log.warn("Ресурс не найден: {}", ex.getMessage());
@@ -33,8 +37,38 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDto);
     }
 
+    @ExceptionHandler(RetryableException.class)
+    public ResponseEntity<ErrorDto> handleRetryableException(RetryableException ex) {
+        log.error("Внешний сервис недоступен", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorDto);
+    }
+
+    @ExceptionHandler(FeignException.BadRequest.class)
+    public ResponseEntity<ErrorDto> handleFeignBadRequestException(FeignException.BadRequest ex) {
+        log.warn("Некорректный запрос к внешнему сервису: {}", ex.getMessage());
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
+    @ExceptionHandler(FeignException.FeignServerException.class)
+    public ResponseEntity<ErrorDto> handleFeignServerException(FeignException.FeignServerException ex) {
+        log.error("Ошибка на стороне внешнего сервиса", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_GATEWAY)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorDto);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<MappingErrorDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<MappingErrorDto> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -42,7 +76,6 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         log.warn("Ошибка валидации входящего запроса: {}", errors);
-
         MappingErrorDto errorDto = MappingErrorDto.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .message("Ошибка валидации данных")
@@ -53,7 +86,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDto> handleAllUnhandledExceptions(Exception ex) {
+    public ResponseEntity<ErrorDto> handleAllUnhandledException(Exception ex) {
         log.error("Внутренняя ошибка сервера: {}", ex.getMessage(), ex);
         ErrorDto errorDto = ErrorDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

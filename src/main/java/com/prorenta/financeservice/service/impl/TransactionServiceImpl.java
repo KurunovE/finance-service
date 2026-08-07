@@ -1,6 +1,8 @@
 package com.prorenta.financeservice.service.impl;
 
 import com.prorenta.financeservice.exception.TransactionNotFoundException;
+import com.prorenta.financeservice.exception.UserNotFoundException;
+import com.prorenta.financeservice.integration.UserFeignClient;
 import com.prorenta.financeservice.mapper.TransactionMapper;
 import com.prorenta.financeservice.model.dto.*;
 import com.prorenta.financeservice.model.entity.Category;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,13 +35,21 @@ public class TransactionServiceImpl implements TransactionService {
     private final CurrencyService currencyService;
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final UserFeignClient userFeignClient;
 
     @Override
     @Transactional
     public TransactionResponseDto createTransaction(CreateTransactionRequestDto dto) {
         log.info("Создание транзакции: userId={}", dto.userId());
 
-        UserInfoDto user = new UserInfoDto(dto.userId(), "Name");
+        ResponseEntity<UserInfoDto> userInfo = userFeignClient.getUserInfo(dto.userId());
+        UserInfoDto user = userInfo.getBody();
+
+        if (user == null || user.id() == null || user.name() == null) {
+            log.error("Пользователь с id={} не найден или тело ответа пустое", dto.userId());
+            throw new UserNotFoundException("Данные пользователь с id=" + dto.userId() + " не найдены");
+        }
+
         Category category = categoryService.findById(dto.categoryId());
         Currency currency = currencyService.findById(dto.currencyId());
 

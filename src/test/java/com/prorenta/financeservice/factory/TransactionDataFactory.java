@@ -1,7 +1,6 @@
 package com.prorenta.financeservice.factory;
 
-import com.prorenta.financeservice.model.dto.CreateTransactionRequestDto;
-import com.prorenta.financeservice.model.dto.TransactionResponseDto;
+import com.prorenta.financeservice.model.dto.*;
 import com.prorenta.financeservice.model.entity.Category;
 import com.prorenta.financeservice.model.entity.Currency;
 import com.prorenta.financeservice.model.entity.Transaction;
@@ -9,14 +8,25 @@ import com.prorenta.financeservice.model.enums.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public class TransactionDataFactory {
 
     public static final UUID DEFAULT_USER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    public static final String DEFAULT_USERNAME = "User";
     public static final LocalDate DEFAULT_DATE = LocalDate.now();
 
-    public static Category createDefaultCategory(UUID userId) {
+    public static UserInfoDto createDefaultUserInfoDto() {
+        return UserInfoDto.builder()
+                .id(DEFAULT_USER_ID)
+                .name(DEFAULT_USERNAME)
+                .build();
+    }
+
+    public static Category createDefaultCategory(
+            UUID userId
+    ) {
         return Category.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
@@ -33,7 +43,11 @@ public class TransactionDataFactory {
                 .build();
     }
 
-    public static Transaction createDefaultTransaction(UUID userId, Category category, Currency currency) {
+    public static Transaction createDefaultTransaction(
+            UUID userId,
+            Category category,
+            Currency currency
+    ) {
         return Transaction.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
@@ -46,7 +60,11 @@ public class TransactionDataFactory {
                 .build();
     }
 
-    public static CreateTransactionRequestDto createRequestDto(UUID userId, Category category, Currency currency) {
+    public static CreateTransactionRequestDto createRequestDto(
+            UUID userId,
+            Category category,
+            Currency currency
+    ) {
         return CreateTransactionRequestDto.builder()
                 .userId(userId)
                 .categoryId(category.getId())
@@ -58,7 +76,11 @@ public class TransactionDataFactory {
                 .build();
     }
 
-    public static TransactionResponseDto createResponseDto(Transaction transaction, Category category, Currency currency) {
+    public static TransactionResponseDto createResponseDto(
+            Transaction transaction,
+            Category category,
+            Currency currency
+    ) {
         return TransactionResponseDto.builder()
                 .id(transaction.getId())
                 .categoryName(category.getName())
@@ -70,4 +92,19 @@ public class TransactionDataFactory {
                 .build();
     }
 
+    public static FilterTransactionRequestDto createFilterTransactionRequestDto(
+            String categoryName,
+            LocalDate startCreatedDate,
+            LocalDate endCreatedDate
+    ) {
+        return FilterTransactionRequestDto.builder()
+                .categoryName(categoryName)
+                .startCreatedDate(startCreatedDate)
+                .endCreatedDate(endCreatedDate)
+                .page(0)
+                .pageSize(10)
+                .sortDirection("asc")
+                .fieldSort("createdDate")
+                .build();
+    }
 }

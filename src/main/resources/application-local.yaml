@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+user:
+  service:
+    url: http://localhost:9090
 
 spring:
   datasource:

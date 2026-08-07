@@ -1,10 +1,12 @@
 package com.prorenta.financeservice.model.dto;
 
 import jakarta.validation.constraints.AssertTrue;
+import lombok.Builder;
 
 import java.time.LocalDate;
 import java.util.Set;
 
+@Builder
 public record FilterTransactionRequestDto(
         String categoryName,
         LocalDate startCreatedDate,
