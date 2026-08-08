@@ -4,44 +4,14 @@ import com.prorenta.financeservice.model.dto.*;
 import com.prorenta.financeservice.model.entity.Category;
 import com.prorenta.financeservice.model.entity.Currency;
 import com.prorenta.financeservice.model.entity.Transaction;
-import com.prorenta.financeservice.model.enums.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 public class TransactionDataFactory {
 
-    public static final UUID DEFAULT_USER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
-    public static final String DEFAULT_USERNAME = "User";
     public static final LocalDate DEFAULT_DATE = LocalDate.now();
-
-    public static UserInfoDto createDefaultUserInfoDto() {
-        return UserInfoDto.builder()
-                .id(DEFAULT_USER_ID)
-                .name(DEFAULT_USERNAME)
-                .build();
-    }
-
-    public static Category createDefaultCategory(
-            UUID userId
-    ) {
-        return Category.builder()
-                .id(UUID.randomUUID())
-                .userId(userId)
-                .name("Category")
-                .type(CategoryType.EXPENSE)
-                .build();
-    }
-
-    public static Currency createDefaultCurrency() {
-        return Currency.builder()
-                .id(UUID.randomUUID())
-                .code("RUB")
-                .name("Ruble")
-                .build();
-    }
 
     public static Transaction createDefaultTransaction(
             UUID userId,

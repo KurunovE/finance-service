@@ -31,6 +31,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.prorenta.financeservice.factory.TransactionDataFactory.*;
+import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
+import static com.prorenta.financeservice.factory.CategoryDataFactory.*;
+import static com.prorenta.financeservice.factory.UserInfoDataFactory.*;
 
 import java.awt.*;
 import java.math.BigDecimal;
