@@ -1,5 +1,6 @@
 package com.prorenta.financeservice.factory;
 
+import com.prorenta.financeservice.model.dto.CreateCategoryRequestDto;
 import com.prorenta.financeservice.model.entity.Category;
 import com.prorenta.financeservice.model.enums.CategoryType;
 
@@ -15,6 +16,16 @@ public class CategoryDataFactory {
     ) {
         return Category.builder()
                 .id(DEFAULT_CATEGORY_ID)
+                .userId(userId)
+                .name(DEFAULT_CATEGORY_NAME)
+                .type(CategoryType.EXPENSE)
+                .build();
+    }
+
+    public static CreateCategoryRequestDto createDefaultCategoryRequestDto(
+            UUID userId
+    ) {
+        return CreateCategoryRequestDto.builder()
                 .userId(userId)
                 .name(DEFAULT_CATEGORY_NAME)
                 .type(CategoryType.EXPENSE)

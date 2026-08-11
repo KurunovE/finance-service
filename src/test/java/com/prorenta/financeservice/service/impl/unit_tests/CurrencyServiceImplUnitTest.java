@@ -1,5 +1,6 @@
-package com.prorenta.financeservice.service.impl;
+package com.prorenta.financeservice.service.impl.unit_tests;
 
+import com.prorenta.financeservice.service.impl.CategoryServiceImpl;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -8,6 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {
         CategoryServiceImpl.class
 })
-public class CurrencyServiceImplTest {
+public class CurrencyServiceImplUnitTest {
 
 }

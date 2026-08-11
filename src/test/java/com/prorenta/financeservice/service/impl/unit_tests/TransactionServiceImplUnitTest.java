@@ -1,4 +1,4 @@
-package com.prorenta.financeservice.service.impl;
+package com.prorenta.financeservice.service.impl.unit_tests;
 
 import com.prorenta.financeservice.exception.CategoryNotFoundException;
 import com.prorenta.financeservice.exception.CurrencyNotFoundException;
@@ -14,6 +14,7 @@ import com.prorenta.financeservice.repository.TransactionRepository;
 import com.prorenta.financeservice.service.CategoryService;
 import com.prorenta.financeservice.service.CurrencyService;
 import com.prorenta.financeservice.service.TransactionService;
+import com.prorenta.financeservice.service.impl.TransactionServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,6 @@ import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
 import static com.prorenta.financeservice.factory.CategoryDataFactory.*;
 import static com.prorenta.financeservice.factory.UserInfoDataFactory.*;
 
-import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -47,7 +47,7 @@ import java.util.UUID;
         TransactionServiceImpl.class,
         TransactionMapperImpl.class
 })
-public class TransactionServiceImplTest {
+public class TransactionServiceImplUnitTest {
 
     @Autowired
     private TransactionService transactionService;
