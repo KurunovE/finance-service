@@ -32,6 +32,8 @@ public class TransactionFilterSpecification {
                                     : criteriaBuilder.between(root.get("createdAt"), startDate, endCreatedDate)
                     ).ifPresent(predicates::add);
 
+            predicates.add(criteriaBuilder.equal(root.get("isDeleted"), false));
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

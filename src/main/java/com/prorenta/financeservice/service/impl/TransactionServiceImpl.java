@@ -1,5 +1,6 @@
 package com.prorenta.financeservice.service.impl;
 
+import com.prorenta.financeservice.exception.CategoryNotFoundException;
 import com.prorenta.financeservice.exception.TransactionNotFoundException;
 import com.prorenta.financeservice.exception.UserNotFoundException;
 import com.prorenta.financeservice.integration.UserFeignClient;
@@ -112,8 +113,16 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
                 () -> new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена")
         );
+
+        if (transaction.isDeleted()) {
+            throw new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена");
+        }
+
         if (dto.categoryId() != null) {
             Category category = categoryService.findById(dto.categoryId());
+            if (!transaction.getUserId().equals(category.getUserId())) {
+                throw new CategoryNotFoundException("Категория с id=" + dto.categoryId() + " не найдена");
+            }
             log.debug("Загружена категория: categoryId={}", category.getId());
             transaction.setCategory(category);
         }

@@ -29,4 +29,8 @@ public class Category {
     @Column(name = "type", nullable = false)
     private CategoryType type;
 
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
 }

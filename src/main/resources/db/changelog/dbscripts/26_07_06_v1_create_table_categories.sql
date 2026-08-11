@@ -4,6 +4,7 @@ CREATE TABLE categories
     user_id UUID        NOT NULL,
     name    VARCHAR(30) NOT NULL CHECK (TRIM(name) <> ''),
     type    VARCHAR(20) NOT NULL CHECK (type in ('INCOME', 'EXPENSE')),
+    is_deleted   BOOLEAN NOT NULL DEFAULT FALSE,
 
     CONSTRAINT uq_user_category_name UNIQUE (user_id, name)
 );
