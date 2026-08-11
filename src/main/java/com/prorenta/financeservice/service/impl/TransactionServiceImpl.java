@@ -110,13 +110,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto dto) {
         log.info("Обновление транзакции: transactionId={}", transactionId);
-        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
+        Transaction transaction = transactionRepository.findActiveTransactionById(transactionId).orElseThrow(
                 () -> new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена")
         );
-
-        if (transaction.isDeleted()) {
-            throw new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена");
-        }
 
         if (dto.categoryId() != null) {
             Category category = categoryService.findById(dto.categoryId());

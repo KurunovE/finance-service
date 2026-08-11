@@ -39,6 +39,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
@@ -228,8 +229,8 @@ public class TransactionServiceImplTest {
                 .bank("Новый банк")
                 .build();
 
-        Mockito.when(transactionRepository.findById(transactionId))
-                .thenReturn(java.util.Optional.of(existingTransaction));
+        Mockito.when(transactionRepository.findActiveTransactionById(transactionId))
+                .thenReturn(Optional.of(existingTransaction));
         Mockito.when(transactionRepository.save(Mockito.any(Transaction.class)))
                 .thenReturn(existingTransaction);
 
@@ -248,7 +249,7 @@ public class TransactionServiceImplTest {
         UpdateTransactionRequestDto requestDto = UpdateTransactionRequestDto.builder().build();
         String message = "Транзакция с id=" + transactionId + " не найдена";
 
-        Mockito.when(transactionRepository.findById(transactionId))
+        Mockito.when(transactionRepository.findActiveTransactionById(transactionId))
                 .thenReturn(java.util.Optional.empty());
 
         TransactionNotFoundException thrown = Assertions.assertThrows(
@@ -272,8 +273,8 @@ public class TransactionServiceImplTest {
                 .build();
         String message = "Категория с id=" + wrongCategoryId + " не найдена";
 
-        Mockito.when(transactionRepository.findById(existingTransaction.getId()))
-                .thenReturn(java.util.Optional.of(existingTransaction));
+        Mockito.when(transactionRepository.findActiveTransactionById(existingTransaction.getId()))
+                .thenReturn(Optional.of(existingTransaction));
         Mockito.when(categoryService.findById(wrongCategoryId))
                 .thenThrow(new CategoryNotFoundException(message));
 
@@ -300,8 +301,8 @@ public class TransactionServiceImplTest {
                 .build();
         String message = "Валюта с id=" + wrongCurrencyId + " не найдена";
 
-        Mockito.when(transactionRepository.findById(existingTransaction.getId()))
-                .thenReturn(java.util.Optional.of(existingTransaction));
+        Mockito.when(transactionRepository.findActiveTransactionById(existingTransaction.getId()))
+                .thenReturn(Optional.of(existingTransaction));
         Mockito.when(currencyService.findById(wrongCurrencyId))
                 .thenThrow(new CurrencyNotFoundException(message));
 
@@ -314,12 +315,66 @@ public class TransactionServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление транзакции: категория принадлежит другому пользователю")
+    public void updateTransactionCategoryBelongsToAnotherUserTest() {
+        UUID userA = UUID.randomUUID();
+        UUID userB = UUID.randomUUID();
+        Transaction existingTransaction = createDefaultTransaction(
+                userA,
+                createDefaultCategory(userA),
+                createDefaultCurrency()
+        );
+        Category categoryUserB = createDefaultCategory(userB);
+        UpdateTransactionRequestDto requestDto = UpdateTransactionRequestDto.builder()
+                .categoryId(categoryUserB.getId())
+                .build();
+        String expectedMessage = "Категория с id=" + requestDto.categoryId() + " не найдена";
+
+        Mockito.when(transactionRepository.findActiveTransactionById(existingTransaction.getId()))
+                .thenReturn(Optional.of(existingTransaction));
+        Mockito.when(categoryService.findById(requestDto.categoryId()))
+                .thenReturn(categoryUserB);
+
+        CategoryNotFoundException thrown = Assertions.assertThrows(
+                CategoryNotFoundException.class,
+                () -> transactionService.updateTransaction(existingTransaction.getId(), requestDto)
+        );
+
+        Assertions.assertEquals(expectedMessage, thrown.getMessage());
+        Mockito.verify(transactionRepository, Mockito.never()).save(Mockito.any(Transaction.class));
+    }
+
+    @Test
+    @DisplayName("Обновление транзакции: пустой DTO")
+    public void updateTransactionEmptyDtoTest() {
+        UserInfoDto userInfoDto = createDefaultUserInfoDto();
+        Category category = createDefaultCategory(userInfoDto.id());
+        Currency currency = createDefaultCurrency();
+        Transaction existingTransaction = createDefaultTransaction(userInfoDto.id(), category, currency);
+        UpdateTransactionRequestDto emptyRequestDto = UpdateTransactionRequestDto.builder().build();
+
+        Mockito.when(transactionRepository.findActiveTransactionById(existingTransaction.getId()))
+                .thenReturn(Optional.of(existingTransaction));
+        Mockito.when(transactionRepository.save(Mockito.any(Transaction.class)))
+                .thenReturn(existingTransaction);
+
+        TransactionResponseDto actual = transactionService.updateTransaction(
+                existingTransaction.getId(),
+                emptyRequestDto
+        );
+
+        Assertions.assertNotNull(actual);
+        Assertions.assertEquals(existingTransaction.getAmount(), actual.amount());
+    }
+
+    @Test
     @DisplayName("Удаление транзакции: успешно")
     public void softRemoveTransactionSuccessfulTest() {
         UUID transactionId = UUID.randomUUID();
 
         transactionService.softRemoveTransaction(transactionId);
 
-        Mockito.verify(transactionRepository, Mockito.times(1)).softRemoveTransaction(transactionId);
+        Mockito.verify(transactionRepository, Mockito.times(1))
+                .softRemoveTransaction(transactionId);
     }
 }
