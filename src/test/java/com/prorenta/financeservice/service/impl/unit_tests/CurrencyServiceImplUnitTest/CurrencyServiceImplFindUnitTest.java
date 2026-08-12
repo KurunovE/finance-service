@@ -18,8 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.prorenta.financeservice.factory.CurrencyDataFactory.DEFAULT_CURRENCY_ID;
-import static com.prorenta.financeservice.factory.CurrencyDataFactory.createDefaultCurrency;
+import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
