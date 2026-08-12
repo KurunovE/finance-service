@@ -1,4 +1,4 @@
-package com.prorenta.financeservice.service.impl.unit_tests;
+package com.prorenta.financeservice.service.impl.unit_tests.CurrencyServiceImplUnitTest;
 
 import com.prorenta.financeservice.exception.CurrencyNotFoundException;
 import com.prorenta.financeservice.model.entity.Currency;
@@ -18,13 +18,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
+import static com.prorenta.financeservice.factory.CurrencyDataFactory.DEFAULT_CURRENCY_ID;
+import static com.prorenta.financeservice.factory.CurrencyDataFactory.createDefaultCurrency;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
         CurrencyServiceImpl.class
 })
-public class CurrencyServiceImplUnitTest {
+public class CurrencyServiceImplFindUnitTest {
 
     @Autowired
     private CurrencyService currencyService;
