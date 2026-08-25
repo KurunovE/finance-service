@@ -27,7 +27,7 @@ import java.util.UUID;
         CategoryServiceImpl.class,
         CategoryMapperImpl.class
 })
-public class CategoryServiceImplCreateUnitTest {
+public class CreateCategoryServiceImplUnitTest {
 
     @Autowired
     private CategoryService categoryService;

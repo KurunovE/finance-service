@@ -39,7 +39,7 @@ import java.util.List;
         TransactionServiceImpl.class,
         TransactionMapperImpl.class
 })
-public class TransactionServiceImplGetUnitTest {
+public class GetTransactionServiceImplUnitTest {
 
     @Autowired
     private TransactionService transactionService;

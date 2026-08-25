@@ -23,7 +23,7 @@ import java.util.UUID;
         TransactionServiceImpl.class,
         TransactionMapperImpl.class
 })
-public class TransactionServiceImplRemoveUnitTest {
+public class RemoveTransactionServiceImplUnitTest {
 
     @Autowired
     private TransactionService transactionService;

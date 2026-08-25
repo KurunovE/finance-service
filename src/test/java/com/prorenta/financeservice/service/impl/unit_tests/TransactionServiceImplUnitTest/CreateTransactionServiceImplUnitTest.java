@@ -37,7 +37,7 @@ import java.util.UUID;
         TransactionServiceImpl.class,
         TransactionMapperImpl.class
 })
-public class TransactionServiceImplCreateUnitTest {
+public class CreateTransactionServiceImplUnitTest {
 
     @Autowired
     private TransactionService transactionService;

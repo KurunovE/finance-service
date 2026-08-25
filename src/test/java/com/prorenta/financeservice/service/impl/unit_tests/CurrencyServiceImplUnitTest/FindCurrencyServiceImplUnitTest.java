@@ -24,7 +24,7 @@ import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
 @ContextConfiguration(classes = {
         CurrencyServiceImpl.class
 })
-public class CurrencyServiceImplFindUnitTest {
+public class FindCurrencyServiceImplUnitTest {
 
     @Autowired
     private CurrencyService currencyService;

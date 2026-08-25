@@ -22,7 +22,7 @@ import java.util.UUID;
         CategoryServiceImpl.class,
         CategoryMapperImpl.class
 })
-public class CategoryServiceImplRemoveUnitTest {
+public class RemoveCategoryServiceImplUnitTest {
 
     @Autowired
     private CategoryService categoryService;
