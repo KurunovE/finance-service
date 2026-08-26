@@ -35,10 +35,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        TransactionServiceImpl.class,
-        TransactionMapperImpl.class
-})
+@ContextConfiguration(
+        classes = {
+                TransactionServiceImpl.class,
+                TransactionMapperImpl.class
+        }
+)
 public class GetTransactionServiceImplUnitTest {
 
     @Autowired

@@ -21,9 +21,11 @@ import java.util.UUID;
 import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        CurrencyServiceImpl.class
-})
+@ContextConfiguration(
+        classes = {
+                CurrencyServiceImpl.class
+        }
+)
 public class FindCurrencyServiceImplUnitTest {
 
     @Autowired

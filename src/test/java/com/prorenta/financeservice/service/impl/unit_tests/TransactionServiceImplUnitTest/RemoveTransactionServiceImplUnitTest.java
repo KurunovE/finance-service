@@ -19,10 +19,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        TransactionServiceImpl.class,
-        TransactionMapperImpl.class
-})
+@ContextConfiguration(
+        classes = {
+                TransactionServiceImpl.class,
+                TransactionMapperImpl.class
+        }
+)
 public class RemoveTransactionServiceImplUnitTest {
 
     @Autowired

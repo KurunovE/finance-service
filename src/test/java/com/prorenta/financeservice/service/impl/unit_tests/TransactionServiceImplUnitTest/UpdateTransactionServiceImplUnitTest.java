@@ -34,10 +34,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        TransactionServiceImpl.class,
-        TransactionMapperImpl.class
-})
+@ContextConfiguration(
+        classes = {
+                TransactionServiceImpl.class,
+                TransactionMapperImpl.class
+        }
+)
 public class UpdateTransactionServiceImplUnitTest {
 
     @Autowired

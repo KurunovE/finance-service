@@ -23,10 +23,12 @@ import static com.prorenta.financeservice.factory.CategoryDataFactory.*;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        CategoryServiceImpl.class,
-        CategoryMapperImpl.class
-})
+@ContextConfiguration(
+        classes = {
+                CategoryServiceImpl.class,
+                CategoryMapperImpl.class
+        }
+)
 public class CreateCategoryServiceImplUnitTest {
 
     @Autowired
@@ -56,7 +58,7 @@ public class CreateCategoryServiceImplUnitTest {
     }
 
     @Test
-    @DisplayName("Создание категории: ошибка превышения лимита (LimitExceededException)")
+    @DisplayName("Создание категории: ошибка превышения лимита")
     public void createCategoryLimitExceededTest() {
         UUID userId = UUID.randomUUID();
         CreateCategoryRequestDto requestDto = createDefaultCategoryRequestDto(userId);

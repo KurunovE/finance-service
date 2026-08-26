@@ -18,10 +18,12 @@ import static com.prorenta.financeservice.factory.CategoryDataFactory.*;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        CategoryServiceImpl.class,
-        CategoryMapperImpl.class
-})
+@ContextConfiguration(
+        classes = {
+                CategoryServiceImpl.class,
+                CategoryMapperImpl.class
+        }
+)
 public class RemoveCategoryServiceImplUnitTest {
 
     @Autowired
