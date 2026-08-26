@@ -1,0 +1,80 @@
+package com.prorenta.financeservice.factory;
+
+import com.prorenta.financeservice.model.dto.*;
+import com.prorenta.financeservice.model.entity.Category;
+import com.prorenta.financeservice.model.entity.Currency;
+import com.prorenta.financeservice.model.entity.Transaction;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
+public class TransactionDataFactory {
+
+    public static final LocalDate DEFAULT_DATE = LocalDate.now();
+
+    public static Transaction createDefaultTransaction(
+            UUID userId,
+            Category category,
+            Currency currency
+    ) {
+        return Transaction.builder()
+                .id(UUID.randomUUID())
+                .userId(userId)
+                .category(category)
+                .currency(currency)
+                .amount(BigDecimal.TEN)
+                .bank("Сбербанк")
+                .description("Обед")
+                .createdDate(DEFAULT_DATE)
+                .build();
+    }
+
+    public static CreateTransactionRequestDto createRequestDto(
+            UUID userId,
+            Category category,
+            Currency currency
+    ) {
+        return CreateTransactionRequestDto.builder()
+                .userId(userId)
+                .categoryId(category.getId())
+                .currencyId(currency.getId())
+                .amount(BigDecimal.TEN)
+                .bank("Сбербанк")
+                .description("Обед")
+                .createdDate(DEFAULT_DATE)
+                .build();
+    }
+
+    public static TransactionResponseDto createResponseDto(
+            Transaction transaction,
+            Category category,
+            Currency currency
+    ) {
+        return TransactionResponseDto.builder()
+                .id(transaction.getId())
+                .categoryName(category.getName())
+                .currencyCode(currency.getCode())
+                .amount(transaction.getAmount())
+                .bank(transaction.getBank())
+                .description(transaction.getDescription())
+                .createdDate(transaction.getCreatedDate())
+                .build();
+    }
+
+    public static FilterTransactionRequestDto createFilterTransactionRequestDto(
+            String categoryName,
+            LocalDate startCreatedDate,
+            LocalDate endCreatedDate
+    ) {
+        return FilterTransactionRequestDto.builder()
+                .categoryName(categoryName)
+                .startCreatedDate(startCreatedDate)
+                .endCreatedDate(endCreatedDate)
+                .page(0)
+                .pageSize(10)
+                .sortDirection("asc")
+                .fieldSort("createdDate")
+                .build();
+    }
+}
