@@ -1,5 +1,6 @@
 package com.prorenta.financeservice.factory;
 
+import com.prorenta.financeservice.model.dto.CategoryResponseDto;
 import com.prorenta.financeservice.model.dto.CreateCategoryRequestDto;
 import com.prorenta.financeservice.model.entity.Category;
 import com.prorenta.financeservice.model.enums.CategoryType;
@@ -27,6 +28,26 @@ public class CategoryDataFactory {
     ) {
         return CreateCategoryRequestDto.builder()
                 .userId(userId)
+                .name(DEFAULT_CATEGORY_NAME)
+                .type(CategoryType.EXPENSE)
+                .build();
+    }
+
+    public static CreateCategoryRequestDto createIncorrectCategoryRequestDto(
+            UUID userId
+    ) {
+        return CreateCategoryRequestDto.builder()
+                .userId(userId)
+                .name("")
+                .type(null)
+                .build();
+    }
+
+    public static CategoryResponseDto createDefaultCategoryResponseDto(
+            UUID categoryId
+    ) {
+        return CategoryResponseDto.builder()
+                .id(categoryId)
                 .name(DEFAULT_CATEGORY_NAME)
                 .type(CategoryType.EXPENSE)
                 .build();

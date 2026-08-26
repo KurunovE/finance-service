@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Builder
 public record CreateCategoryRequestDto(
-        @NotBlank(message = "userId обязателен")
+        @NotNull(message = "userId обязателен")
         UUID userId,
 
         @NotBlank(message = "Название категории обязательно")
@@ -18,7 +18,6 @@ public record CreateCategoryRequestDto(
         String name,
 
         @NotNull(message = "Тип категории обязателен")
-        @Size(max = 20)
         CategoryType type
 ) {
 }

@@ -37,6 +37,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDto);
     }
 
+    @ExceptionHandler(LimitExceededException.class)
+    public ResponseEntity<ErrorDto> handleLimitExceededException(LimitExceededException ex) {
+        log.warn("Лимит исчерпан: {}", ex.getMessage());
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
     @ExceptionHandler(RetryableException.class)
     public ResponseEntity<ErrorDto> handleRetryableException(RetryableException ex) {
         log.error("Внешний сервис недоступен", ex);
