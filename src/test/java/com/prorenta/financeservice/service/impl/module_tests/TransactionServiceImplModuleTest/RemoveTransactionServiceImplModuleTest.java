@@ -60,7 +60,8 @@ public class RemoveTransactionServiceImplModuleTest {
         MvcResult mvcResult = mockMvc.perform(delete("/api/v1/transactions/{id}", transactionId))
                 .andReturn();
 
-        Assertions.assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.NO_CONTENT.value());
 
         Mockito.verify(transactionRepository, Mockito.times(1)).softRemoveTransaction(transactionId);
     }
@@ -72,7 +73,9 @@ public class RemoveTransactionServiceImplModuleTest {
         MvcResult mvcResult = mockMvc.perform(delete("/api/v1/transactions/{id}", "invalid-uuid"))
                 .andReturn();
 
-        Assertions.assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
         Mockito.verifyNoInteractions(transactionRepository);
     }
 }

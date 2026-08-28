@@ -102,7 +102,6 @@ public class CreateTransactionServiceImplModuleTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.CREATED.value());
-
         Assertions.assertThat(actual)
                 .usingRecursiveComparison()
                 .withEqualsForType(LocalDate::isEqual, LocalDate.class)
@@ -165,8 +164,9 @@ public class CreateTransactionServiceImplModuleTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NOT_FOUND.value());
+        Assertions.assertThat(actual.message())
+                .isEqualTo(expected.message());
 
-        Assertions.assertThat(actual.message()).isEqualTo(expected.message());
         Mockito.verifyNoInteractions(transactionRepository);
     }
 }

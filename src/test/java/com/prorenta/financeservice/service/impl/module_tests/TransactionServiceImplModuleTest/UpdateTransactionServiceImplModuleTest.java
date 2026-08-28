@@ -106,9 +106,12 @@ public class UpdateTransactionServiceImplModuleTest {
         String responseContent = mvcResult.getResponse().getContentAsString();
         TransactionResponseDto actual = objectMapper.readValue(responseContent, TransactionResponseDto.class);
 
-        Assertions.assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(actual.amount()).isEqualTo(requestDto.amount());
-        Assertions.assertThat(actual.description()).isEqualTo(requestDto.description());
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(actual.amount())
+                .isEqualTo(requestDto.amount());
+        Assertions.assertThat(actual.description())
+                .isEqualTo(requestDto.description());
     }
 
     @Test
@@ -131,8 +134,10 @@ public class UpdateTransactionServiceImplModuleTest {
         String responseContent = mvcResult.getResponse().getContentAsString();
         ErrorDto actualError = objectMapper.readValue(responseContent, ErrorDto.class);
 
-        Assertions.assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        Assertions.assertThat(actualError.message()).isEqualTo(errorMessage);
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.NOT_FOUND.value());
+        Assertions.assertThat(actualError.message())
+                .isEqualTo(errorMessage);
     }
 
     @Test
@@ -145,7 +150,9 @@ public class UpdateTransactionServiceImplModuleTest {
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
-        Assertions.assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
         Mockito.verifyNoInteractions(transactionRepository);
     }
 }

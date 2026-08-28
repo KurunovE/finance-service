@@ -99,10 +99,14 @@ public class GetTransactionServiceImplModuleTest {
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.OK.value());
 
-        Assertions.assertThat(actual).isNotNull();
-        Assertions.assertThat(actual.transactions()).hasSize(1);
-        Assertions.assertThat(actual.countTransactions()).isEqualTo(1L);
-        Assertions.assertThat(actual.transactions().getFirst().id()).isEqualTo(transaction.getId());
+        Assertions.assertThat(actual)
+                .isNotNull();
+        Assertions.assertThat(actual.transactions())
+                .hasSize(1);
+        Assertions.assertThat(actual.countTransactions())
+                .isEqualTo(1L);
+        Assertions.assertThat(actual.transactions().getFirst().id())
+                .isEqualTo(transaction.getId());
     }
 
     @Test
@@ -124,10 +128,12 @@ public class GetTransactionServiceImplModuleTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.OK.value());
-
-        Assertions.assertThat(actual).isNotNull();
-        Assertions.assertThat(actual.transactions()).isEmpty();
-        Assertions.assertThat(actual.countTransactions()).isEqualTo(0L);
+        Assertions.assertThat(actual)
+                .isNotNull();
+        Assertions.assertThat(actual.transactions())
+                .isEmpty();
+        Assertions.assertThat(actual.countTransactions())
+                .isEqualTo(0);
     }
 
     @Test
