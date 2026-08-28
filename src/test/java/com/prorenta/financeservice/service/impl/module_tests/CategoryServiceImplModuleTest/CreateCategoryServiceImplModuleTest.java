@@ -12,6 +12,7 @@ import com.prorenta.financeservice.model.dto.CreateCategoryRequestDto;
 import com.prorenta.financeservice.model.dto.ErrorDto;
 import com.prorenta.financeservice.model.dto.UserInfoDto;
 import com.prorenta.financeservice.model.entity.Category;
+import com.prorenta.financeservice.model.enums.CategoryType;
 import com.prorenta.financeservice.repository.CategoryRepository;
 import com.prorenta.financeservice.service.impl.CategoryServiceImpl;
 import lombok.SneakyThrows;
@@ -153,5 +154,67 @@ public class CreateCategoryServiceImplModuleTest {
 
         Assertions.assertThat(actual.message())
                 .isEqualTo(expected.message());
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Создание категории: ошибка 400 (Отсутствует тело запроса)")
+    public void createCategoryMissingBody() {
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(categoryRepository);
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Создание категории: ошибка 400 (Пустое имя категории)")
+    public void createCategoryBlankName() {
+        UUID userId = UUID.randomUUID();
+        CreateCategoryRequestDto requestDto = CreateCategoryRequestDto.builder()
+                .userId(userId)
+                .name("   ")
+                .type(CategoryType.EXPENSE)
+                .build();
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(categoryRepository);
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Создание категории: ошибка 400 (Невалидное значение Enum)")
+    public void createCategoryInvalidEnum() {
+        String invalidJson = """
+                {
+                  "userId": "11111111-1111-1111-1111-111111111111",
+                  "name": "Еда",
+                  "type": "UNKNOWN_TYPE"
+                }
+                """;
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
+                        .content(invalidJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(categoryRepository);
     }
 }
