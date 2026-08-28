@@ -111,4 +111,36 @@ public class GetCategoryServiceImplModuleTest {
         Assertions.assertThat(actual).isNotNull();
         Assertions.assertThat(actual.categories()).isEmpty();
     }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Получение списка категорий: ошибка 400 (Отсутствует обязательный параметр userId)")
+    public void getAllCategoriesMissingUserIdParam() {
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.NOT_FOUND.value());
+
+        Mockito.verifyNoInteractions(categoryRepository);
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Получение списка категорий: ошибка 400 (Невалидный формат UUID)")
+    public void getAllCategoriesInvalidUuidFormat() {
+        String invalidUuid = "12345-invalid-string";
+
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories/" + invalidUuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(categoryRepository);
+    }
 }
