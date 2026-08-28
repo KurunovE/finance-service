@@ -7,6 +7,7 @@ import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -84,6 +85,16 @@ public class GlobalExceptionHandler {
         ErrorDto errorDto = ErrorDto.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .message("Неверный формат параметра: " + ex.getName())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.warn("Некорректное тело входящего запроса: {}", ex.getMessage());
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message("Некорректное тело запроса: проверьте синтаксис JSON и переданные типы данных")
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
