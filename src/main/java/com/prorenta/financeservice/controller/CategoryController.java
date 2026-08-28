@@ -64,12 +64,9 @@ public interface CategoryController {
             @Valid @RequestBody CreateCategoryRequestDto request
     );
 
-    @GetMapping("/{id}")
+    @GetMapping("/{userId}")
     @Operation(
-            summary = "Получение всех категорий пользователя",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Данные для получения категорий"
-            )
+            summary = "Получение всех категорий пользователя"
     )
     @ApiResponses({
             @ApiResponse(
@@ -90,6 +87,28 @@ public interface CategoryController {
             )
     })
     ResponseEntity<GetAllCategoriesResponseDto> getCategories(
-            @PathVariable("id") UUID userId
+            @PathVariable UUID userId
+    );
+
+    @PatchMapping("/{categoryId}/delete")
+    @Operation(
+            summary = "Мягкое удаление категории"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Успешное удаление категории"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Ошибка в запросе",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ErrorDto.class)
+                    )
+            )
+    })
+    ResponseEntity<Void> softRemoveCategory(
+            @PathVariable UUID categoryId
     );
 }

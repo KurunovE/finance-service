@@ -33,4 +33,11 @@ public class CategoryControllerImpl implements CategoryController {
         GetAllCategoriesResponseDto categories = categoryService.getAllCategoriesByUserId(userId);
         return ResponseEntity.ok(categories);
     }
+
+    @Override
+    public ResponseEntity<Void> softRemoveCategory(UUID categoryId) {
+        log.debug("Запрос на удаление категории: categoryId={}", categoryId);
+        categoryService.softRemoveCategory(categoryId);
+        return ResponseEntity.noContent().build();
+    }
 }
