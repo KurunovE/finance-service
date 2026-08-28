@@ -90,18 +90,16 @@ public interface CategoryController {
             @PathVariable UUID userId
     );
 
-    @PatchMapping("/{categoryId}/delete")
-    @Operation(
-            summary = "Мягкое удаление категории"
-    )
+    @DeleteMapping("/{categoryId}")
+    @Operation(summary = "Удаление категории")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Успешное удаление категории"
+                    description = "Категория успешно удалена"
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Ошибка в запросе",
+                    description = "Невалидный формат ID",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorDto.class)

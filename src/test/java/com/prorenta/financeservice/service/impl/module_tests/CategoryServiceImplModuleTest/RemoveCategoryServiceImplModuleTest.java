@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 @WebMvcTest
 @ContextConfiguration(
@@ -51,7 +51,7 @@ public class RemoveCategoryServiceImplModuleTest {
     public void softRemoveCategorySuccessfully() {
         UUID categoryId = CategoryDataFactory.DEFAULT_CATEGORY_ID;
 
-        MvcResult mvcResult = mockMvc.perform(patch("/api/v1/categories/{id}/delete", categoryId)
+        MvcResult mvcResult = mockMvc.perform(delete("/api/v1/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
@@ -68,7 +68,7 @@ public class RemoveCategoryServiceImplModuleTest {
     public void softRemoveCategoryInvalidUuidFormat() {
         String invalidCategoryId = "invalid-uuid-string";
 
-        MvcResult mvcResult = mockMvc.perform(patch("/api/v1/categories/{id}/delete", invalidCategoryId)
+        MvcResult mvcResult = mockMvc.perform(delete("/api/v1/categories/{id}", invalidCategoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
