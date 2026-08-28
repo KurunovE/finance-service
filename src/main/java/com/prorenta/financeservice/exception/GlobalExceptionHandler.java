@@ -11,6 +11,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -25,7 +27,8 @@ public class GlobalExceptionHandler {
             CurrencyNotFoundException.class,
             TransactionNotFoundException.class,
             FeignException.NotFound.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            NoResourceFoundException.class
     })
     public ResponseEntity<ErrorDto> handleNotFoundException(RuntimeException ex) {
         log.warn("Ресурс не найден: {}", ex.getMessage());
@@ -47,16 +50,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
-    @ExceptionHandler(RetryableException.class)
-    public ResponseEntity<ErrorDto> handleRetryableException(RetryableException ex) {
-        log.error("Внешний сервис недоступен", ex);
-        ErrorDto errorDto = ErrorDto.builder()
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .message(ex.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorDto);
-    }
-
     @ExceptionHandler(FeignException.BadRequest.class)
     public ResponseEntity<ErrorDto> handleFeignBadRequestException(FeignException.BadRequest ex) {
         log.warn("Некорректный запрос к внешнему сервису: {}", ex.getMessage());
@@ -65,16 +58,6 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
-    }
-
-    @ExceptionHandler(FeignException.FeignServerException.class)
-    public ResponseEntity<ErrorDto> handleFeignServerException(FeignException.FeignServerException ex) {
-        log.error("Ошибка на стороне внешнего сервиса", ex);
-        ErrorDto errorDto = ErrorDto.builder()
-                .status(HttpStatus.BAD_GATEWAY)
-                .message(ex.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorDto);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -93,6 +76,36 @@ public class GlobalExceptionHandler {
                 .details(errors)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorDto> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        log.warn("Ошибка конвертации параметра: {}", ex.getMessage());
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message("Неверный формат параметра: " + ex.getName())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
+    @ExceptionHandler(FeignException.FeignServerException.class)
+    public ResponseEntity<ErrorDto> handleFeignServerException(FeignException.FeignServerException ex) {
+        log.error("Ошибка на стороне внешнего сервиса", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_GATEWAY)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorDto);
+    }
+
+    @ExceptionHandler(RetryableException.class)
+    public ResponseEntity<ErrorDto> handleRetryableException(RetryableException ex) {
+        log.error("Внешний сервис недоступен", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorDto);
     }
 
     @ExceptionHandler(Exception.class)
