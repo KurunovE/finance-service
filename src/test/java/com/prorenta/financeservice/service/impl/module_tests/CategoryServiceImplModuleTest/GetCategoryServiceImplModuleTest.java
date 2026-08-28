@@ -77,9 +77,12 @@ public class GetCategoryServiceImplModuleTest {
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.OK.value());
 
-        Assertions.assertThat(actual).isNotNull();
-        Assertions.assertThat(actual.categories()).hasSize(1);
-        Assertions.assertThat(actual.categories().getFirst().id()).isEqualTo(category.getId());
+        Assertions.assertThat(actual)
+                .isNotNull();
+        Assertions.assertThat(actual.categories())
+                .hasSize(1);
+        Assertions.assertThat(actual.categories().getFirst().id())
+                .isEqualTo(category.getId());
 
         Mockito.verify(categoryRepository, Mockito.times(1))
                 .findAllByUserId(Mockito.any(UUID.class));
@@ -107,9 +110,10 @@ public class GetCategoryServiceImplModuleTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.OK.value());
-
-        Assertions.assertThat(actual).isNotNull();
-        Assertions.assertThat(actual.categories()).isEmpty();
+        Assertions.assertThat(actual)
+                .isNotNull();
+        Assertions.assertThat(actual.categories())
+                .isEmpty();
     }
 
     @Test

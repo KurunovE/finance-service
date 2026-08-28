@@ -89,7 +89,6 @@ public class CreateCategoryServiceImplModuleTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.CREATED.value());
-
         Assertions.assertThat(actual)
                 .usingRecursiveComparison()
                 .withEqualsForType(ZonedDateTime::isEqual,ZonedDateTime.class)
@@ -151,7 +150,6 @@ public class CreateCategoryServiceImplModuleTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
-
         Assertions.assertThat(actual.message())
                 .isEqualTo(expected.message());
     }
