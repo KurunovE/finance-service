@@ -1,6 +1,8 @@
 package com.prorenta.financeservice.service.impl;
 
 import com.prorenta.financeservice.exception.CurrencyNotFoundException;
+import com.prorenta.financeservice.model.dto.CurrencyResponseDto;
+import com.prorenta.financeservice.model.dto.ListCurrenciesResponseDto;
 import com.prorenta.financeservice.model.entity.Currency;
 import com.prorenta.financeservice.repository.CurrencyRepository;
 import com.prorenta.financeservice.service.CurrencyService;
@@ -24,5 +26,17 @@ public class CurrencyServiceImpl implements CurrencyService {
         return currencyRepository.findById(id).orElseThrow(
                 () -> new CurrencyNotFoundException("Валюта с id=" + id + " не найдена")
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CurrencyResponseDto getCurrency(UUID currencyId) {
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ListCurrenciesResponseDto getCurrencies() {
+        return null;
     }
 }
