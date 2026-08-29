@@ -44,7 +44,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Transactional(readOnly = true)
     public ListCurrenciesResponseDto getCurrencies() {
         log.info("Получение списка всех валют");
-        List<Currency> currencyList = currencyRepository.findAll();
+        List<Currency> currencyList = currencyRepository.findAllActiveCurrencies();
         log.info("Список валют получен: size={}", currencyList.size());
         return ListCurrenciesResponseDto.builder()
                 .currencies(
