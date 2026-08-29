@@ -8,6 +8,7 @@ import java.util.UUID;
 public record CurrencyResponseDto(
         UUID id,
         String code,
-        String name
+        String name,
+        String symbol
 ) {
 }

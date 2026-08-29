@@ -24,6 +24,9 @@ public class Currency {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
+    @Column(name = "symbol", length = 10, nullable = false)
+    private String symbol;
+
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
