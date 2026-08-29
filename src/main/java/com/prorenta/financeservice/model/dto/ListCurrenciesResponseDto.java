@@ -6,6 +6,6 @@ import java.util.List;
 
 @Builder
 public record ListCurrenciesResponseDto(
-        List<CurrencyResponseDto> currency
+        List<CurrencyResponseDto> currencies
 ) {
 }
