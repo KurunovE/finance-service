@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record ListCurrencyResponseDto(
+public record ListCurrenciesResponseDto(
         List<CurrencyResponseDto> currency
 ) {
 }
