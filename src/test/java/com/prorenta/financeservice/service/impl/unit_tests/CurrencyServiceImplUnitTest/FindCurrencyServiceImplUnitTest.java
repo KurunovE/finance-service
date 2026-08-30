@@ -1,6 +1,8 @@
 package com.prorenta.financeservice.service.impl.unit_tests.CurrencyServiceImplUnitTest;
 
 import com.prorenta.financeservice.exception.CurrencyNotFoundException;
+import com.prorenta.financeservice.mapper.CurrencyMapper;
+import com.prorenta.financeservice.mapper.CurrencyMapperImpl;
 import com.prorenta.financeservice.model.entity.Currency;
 import com.prorenta.financeservice.repository.CurrencyRepository;
 import com.prorenta.financeservice.service.CurrencyService;
@@ -23,7 +25,8 @@ import static com.prorenta.financeservice.factory.CurrencyDataFactory.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {
-                CurrencyServiceImpl.class
+                CurrencyServiceImpl.class,
+                CurrencyMapperImpl.class
         }
 )
 public class FindCurrencyServiceImplUnitTest {
@@ -33,6 +36,9 @@ public class FindCurrencyServiceImplUnitTest {
 
     @MockitoBean
     private CurrencyRepository currencyRepository;
+
+    @MockitoBean
+    private CurrencyMapper currencyMapper;
 
     @Test
     @DisplayName("Поиск валюты по id: успешно")
