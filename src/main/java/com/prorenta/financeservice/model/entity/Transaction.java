@@ -31,6 +31,7 @@ public class Transaction {
     @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
 
+    @Builder.Default
     @Column(name = "amount", nullable = false)
     private BigDecimal amount = BigDecimal.ZERO;
 
