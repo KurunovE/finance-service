@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+user:
+  service:
+    url: http://localhost:9090
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.yaml
+    enabled: true
