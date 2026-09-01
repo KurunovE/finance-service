@@ -32,7 +32,7 @@ public class RemoveTransactionServiceImplIntegrationTest extends AbstractIntegra
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Удаление транзакций: мягкое удаление транзакции и проверка её скрытия из БД")
+    @DisplayName("Удаление транзакции: мягкое удаление транзакции и проверка её скрытия из БД")
     public void softDeleteTransactionIntegrationTest() {
         UUID transactionId = UUID.fromString("44444444-4444-4444-4444-444444444441");
 

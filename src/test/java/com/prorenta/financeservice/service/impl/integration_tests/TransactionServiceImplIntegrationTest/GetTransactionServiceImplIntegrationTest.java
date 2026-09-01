@@ -29,7 +29,7 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Получение транзакций: фильтрация без параметров")
+    @DisplayName("Получение транзакции: фильтрация без параметров")
     public void getAllActiveTransactionsTest() {
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -58,7 +58,7 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Получение транзакций: фильтрация строго по имени категории")
+    @DisplayName("Получение транзакции: фильтрация строго по имени категории")
     public void getTransactionsByCategoryNameTest() {
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("categoryName", "Продукты")
@@ -91,7 +91,7 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Получение транзакций: фильтрация по диапазону дат с пагинацией и сортировкой")
+    @DisplayName("Получение транзакции: фильтрация по диапазону дат с пагинацией и сортировкой")
     public void getTransactionsByDateRangeTest() {
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("startCreatedDate", "2026-08-01")
