@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
 
 @Configuration
-public class FeignConfig {
+public class UserFeignConfig {
 
     @Bean
     public Request.Options options() {
