@@ -28,7 +28,7 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @Sql(
             scripts = {
                     "/sql/cleanup.sql",
-                    "/sql/insert_filter_data.sql"
+                    "/sql/insert_transaction_filter_data.sql"
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
@@ -68,7 +68,7 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @Sql(
             scripts = {
                     "/sql/cleanup.sql",
-                    "/sql/insert_filter_data.sql"
+                    "/sql/insert_transaction_filter_data.sql"
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
@@ -104,7 +104,7 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @Sql(
             scripts = {
                     "/sql/cleanup.sql",
-                    "/sql/insert_filter_data.sql"
+                    "/sql/insert_transaction_filter_data.sql"
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
