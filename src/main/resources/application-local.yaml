@@ -5,6 +5,11 @@ user:
   service:
     url: http://localhost:9090
 
+cbr:
+  exchange-rates:
+    url: https://www.cbr.ru/scripts
+    value: /XML_daily.asp
+
 spring:
   datasource:
     url: jdbc:h2:mem:finance_db
