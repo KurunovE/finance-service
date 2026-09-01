@@ -23,4 +23,21 @@ public class UserClientHelper {
                         )
         );
     }
+
+    public void mockUserInfoServerError(UUID userId) {
+        stubFor(
+                get(urlMatching("/api/v1/users/" + userId))
+                        .willReturn(
+                                aResponse()
+                                        .withStatus(500)
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody("""
+                                                {
+                                                    "error":
+                                                    "Internal Server Error"
+                                                }
+                                                """)
+                        )
+        );
+    }
 }

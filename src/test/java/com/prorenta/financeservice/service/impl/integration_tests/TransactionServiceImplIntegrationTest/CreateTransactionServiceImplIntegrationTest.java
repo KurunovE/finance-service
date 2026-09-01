@@ -82,4 +82,42 @@ public class CreateTransactionServiceImplIntegrationTest extends AbstractIntegra
         Assertions.assertThat(actual.categoryName()).isNotBlank();
         Assertions.assertThat(actual.currencyCode()).isNotBlank();
     }
+
+    @Test
+    @Sql(
+            scripts = {
+                    "/sql/cleanup.sql",
+                    "/sql/insert_currency.sql",
+                    "/sql/insert_category.sql"
+            },
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
+    @SneakyThrows
+    @DisplayName("Создание транзакции: сбой UserFeignClient")
+    public void createTransactionUserFeignErrorTest() {
+        UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
+        UUID categoryId = CategoryDataFactory.DEFAULT_CATEGORY_ID;
+        UUID currencyId = CurrencyDataFactory.DEFAULT_CURRENCY_ID;
+
+        CreateTransactionRequestDto requestDto = CreateTransactionRequestDto.builder()
+                .userId(userId)
+                .categoryId(categoryId)
+                .currencyId(currencyId)
+                .amount(java.math.BigDecimal.valueOf(1500.50))
+                .bank("T-Bank")
+                .description("Покупка продуктов")
+                .createdDate(java.time.LocalDate.now())
+                .build();
+
+        userClientHelper.mockUserInfoServerError(userId);
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_GATEWAY.value());
+    }
 }
