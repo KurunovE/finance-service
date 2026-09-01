@@ -22,6 +22,8 @@
         <mapstruct-processor.version>1.6.3</mapstruct-processor.version>
         <spring-cloud.version>2025.0.3</spring-cloud.version>
         <spring-cloud-contract-wiremock.version>4.2.0</spring-cloud-contract-wiremock.version>
+        <embedded-database-spring-test.version>2.5.1</embedded-database-spring-test.version>
+        <embedded-postgres.version>2.0.7</embedded-postgres.version>
     </properties>
 
     <dependencyManagement>
@@ -119,6 +121,29 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <!-- Zonky -->
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-database-spring-test</artifactId>
+            <version>${embedded-database-spring-test.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-postgres</artifactId>
+            <version>${embedded-postgres.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- WireMock -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <version>${spring-cloud-contract-wiremock.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

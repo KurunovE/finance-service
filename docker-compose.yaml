@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:15-alpine
     restart: unless-stopped
@@ -24,7 +23,7 @@ services:
     # image: ghcr.io/kurunove/
     build:
       dockerfile: Dockerfile
-    container_name: finance_service
+    container_name: finance
     restart: unless-stopped
     depends_on:
       postgres:
@@ -42,6 +41,6 @@ volumes:
   pgdata:
 
 networks:
-  finance-network:
+  finance-service-network:
     name: finance-service-network
     driver: bridge

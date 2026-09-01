@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.yaml
+    enabled: true
+
+user:
+  service:
+    url: http://localhost:${wiremock.server.port}

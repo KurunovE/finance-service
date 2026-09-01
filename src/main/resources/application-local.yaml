@@ -7,7 +7,7 @@ user:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:course_db
+    url: jdbc:h2:mem:finance_db
     driver-class-name: org.h2.Driver
     username: admin
     password: pass
