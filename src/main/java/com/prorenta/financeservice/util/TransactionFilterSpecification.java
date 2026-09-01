@@ -28,8 +28,8 @@ public class TransactionFilterSpecification {
             Optional.ofNullable(startCreatedDate)
                     .map(
                             startDate -> endCreatedDate == null
-                                    ? criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate)
-                                    : criteriaBuilder.between(root.get("createdAt"), startDate, endCreatedDate)
+                                    ? criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), startDate)
+                                    : criteriaBuilder.between(root.get("createdDate"), startDate, endCreatedDate)
                     ).ifPresent(predicates::add);
 
             predicates.add(criteriaBuilder.equal(root.get("isDeleted"), false));
