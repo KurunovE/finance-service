@@ -10,6 +10,11 @@ cbr:
     url: https://www.cbr.ru/scripts
     value: /XML_daily.asp
 
+scheduler:
+  cdr-scheduler:
+    cron: 0 0 15 * * MON-FRI
+    zone: Europe/Moscow
+
 spring:
   datasource:
     url: jdbc:h2:mem:finance_db
