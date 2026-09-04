@@ -9,6 +9,7 @@ import com.prorenta.financeservice.repository.CurrencyRepository;
 import com.prorenta.financeservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,9 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "currency_entity_by_id", key = "#id")
     public Currency findById(UUID id) {
+        log.info("Поиск валюты: id={}", id);
         return currencyRepository.findById(id).orElseThrow(
                 () -> new CurrencyNotFoundException("Валюта с id=" + id + " не найдена")
         );
@@ -33,15 +36,19 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "currency_dto_by_id", key = "#currencyId")
     public CurrencyResponseDto getCurrency(UUID currencyId) {
         log.info("Получение валюты: currencyId={}", currencyId);
-        Currency currency = findById(currencyId);
+        Currency currency = currencyRepository.findById(currencyId).orElseThrow(
+                () -> new CurrencyNotFoundException("Валюта с id=" + currencyId + " не найдена")
+        );
         log.info("Валюта успешно получена: Currency={}", currency);
         return currencyMapper.mapCurrencyToCurrencyResponseDto(currency);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "all_currencies")
     public ListCurrenciesResponseDto getCurrencies() {
         log.info("Получение списка всех валют");
         List<Currency> currencyList = currencyRepository.findAllActiveCurrencies();
@@ -53,5 +60,14 @@ public class CurrencyServiceImpl implements CurrencyService {
                                 .toList()
                 )
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "currencies_by_code", key = "#code")
+    public Currency findByCode(String code) {
+        log.info("Поиск валюты: code={}", code);
+        return currencyRepository.findByCode(code)
+                .orElseThrow(() -> new CurrencyNotFoundException("Валюта с code=" + code + " не найдена"));
     }
 }

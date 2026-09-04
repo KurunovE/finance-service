@@ -10,4 +10,5 @@ public interface CurrencyService {
     Currency findById(UUID id);
     CurrencyResponseDto getCurrency(UUID currencyId);
     ListCurrenciesResponseDto getCurrencies();
+    Currency findByCode(String code);
 }
