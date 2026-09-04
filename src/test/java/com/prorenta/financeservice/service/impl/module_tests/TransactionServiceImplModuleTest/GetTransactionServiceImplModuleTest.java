@@ -152,4 +152,21 @@ public class GetTransactionServiceImplModuleTest {
 
         Mockito.verifyNoInteractions(transactionRepository);
     }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Получение списка транзакций: невалидный период дат")
+    public void getTransactionsWithInvalidPeriod() {
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
+                        .param("startCreatedDate", "2026-10-01")
+                        .param("endCreatedDate", "2026-09-01")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(transactionRepository);
+    }
 }

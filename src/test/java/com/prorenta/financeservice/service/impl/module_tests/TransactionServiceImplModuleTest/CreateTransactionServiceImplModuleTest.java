@@ -169,4 +169,31 @@ public class CreateTransactionServiceImplModuleTest {
 
         Mockito.verifyNoInteractions(transactionRepository);
     }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Создание транзакции: нечитаемый JSON / несовпадение типов")
+    public void createTransactionWithUnreadableJson() {
+        String invalidJson = """
+                {
+                  "userId": "11111111-1111-1111-1111-111111111111",
+                  "categoryId": "22222222-2222-2222-2222-222222222222",
+                  "currencyId": "33333333-3333-3333-3333-333333333333",
+                  "amount": "сто рублей",
+                  "createdDate": "2026-07-23"
+                }
+                """;
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
+                        .content(invalidJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(transactionRepository);
+        Mockito.verifyNoInteractions(categoryService);
+    }
 }
