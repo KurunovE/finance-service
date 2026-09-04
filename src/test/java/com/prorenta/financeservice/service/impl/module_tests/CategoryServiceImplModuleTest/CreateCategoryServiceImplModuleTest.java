@@ -156,7 +156,7 @@ public class CreateCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Создание категории: ошибка 400 (Отсутствует тело запроса)")
+    @DisplayName("Создание категории: отсутствует тело запроса")
     public void createCategoryMissingBody() {
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,7 +171,7 @@ public class CreateCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Создание категории: ошибка 400 (Пустое имя категории)")
+    @DisplayName("Создание категории: пустое имя категории")
     public void createCategoryBlankName() {
         UUID userId = UUID.randomUUID();
         CreateCategoryRequestDto requestDto = CreateCategoryRequestDto.builder()
@@ -194,7 +194,7 @@ public class CreateCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Создание категории: ошибка 400 (Невалидное значение Enum)")
+    @DisplayName("Создание категории: невалидное значение Enum")
     public void createCategoryInvalidEnum() {
         String invalidJson = """
                 {
@@ -206,6 +206,31 @@ public class CreateCategoryServiceImplModuleTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
                         .content(invalidJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andReturn();
+
+        Assertions.assertThat(mvcResult.getResponse().getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        Mockito.verifyNoInteractions(categoryRepository);
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Создание категории: превышение максимальной длины имени")
+    public void createCategoryNameTooLong() {
+        UUID userId = UUID.randomUUID();
+        String tooLongName = "A".repeat(31);
+
+        CreateCategoryRequestDto requestDto = CreateCategoryRequestDto.builder()
+                .userId(userId)
+                .name(tooLongName)
+                .type(CategoryType.EXPENSE)
+                .build();
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
+                        .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();

@@ -56,6 +56,6 @@ public class CreateCategoryServiceImplIntegrationTest extends AbstractIntegratio
                 .andReturn();
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                .isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
