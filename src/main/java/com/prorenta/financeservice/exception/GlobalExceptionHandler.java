@@ -5,6 +5,7 @@ import com.prorenta.financeservice.model.dto.MappingErrorDto;
 import feign.FeignException;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -101,6 +102,17 @@ public class GlobalExceptionHandler {
                 .message("Некорректное тело запроса: проверьте синтаксис JSON и переданные типы данных")
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorDto> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        log.warn("Нарушение уникальности имен: {}", ex.getMessage());
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.CONFLICT)
+                .message("Конфликт данных: запись с такими параметрами уже существует")
+                .zonedDateTime(ZonedDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDto);
     }
 
     @ExceptionHandler(FeignException.FeignServerException.class)
