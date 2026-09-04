@@ -13,3 +13,13 @@ spring:
 user:
   service:
     url: http://localhost:${wiremock.server.port}
+
+cbr:
+  exchange-rates:
+    url: http://localhost:${wiremock.server.port}
+    value: /XML_daily.asp
+
+scheduler:
+  cdr-scheduler:
+    cron: "-"
+    zone: Europe/Moscow

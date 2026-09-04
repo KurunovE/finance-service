@@ -35,6 +35,10 @@ spring:
     change-log: classpath:/db/changelog/changelog.yaml
     enabled: true
 
+  cache:
+    type: simple
+    cache-names: currencies_by_code, all_currencies, currency_dto_by_id, currency_entity_by_id
+
 logging:
   level:
     root: info
