@@ -9,6 +9,7 @@ import lombok.Builder;
 
 @Builder
 public record CreateCategoryRequestDto(
+
         @NotBlank(message = "Название категории обязательно")
         @Size(max = 30)
         String name,

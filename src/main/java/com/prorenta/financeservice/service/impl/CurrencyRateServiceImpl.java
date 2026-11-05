@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +33,8 @@ public class CurrencyRateServiceImpl implements CurrencyRateService {
     private final CurrencyRateRepository currencyRateRepository;
 
     private static final int YEARS_LIMIT = 5;
+    private static final DateTimeFormatter CBR_DATE_FORMAT = DateTimeFormatter
+            .ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     @Override
     @Transactional
@@ -40,7 +44,7 @@ public class CurrencyRateServiceImpl implements CurrencyRateService {
             ValCursResponseDto response = cbrFeignClient.getDailyRates(null);
 
             if (response != null && response.currencies() != null) {
-                LocalDate today = LocalDate.now();
+                LocalDate rateDate = LocalDate.parse(response.date(), CBR_DATE_FORMAT);
                 int updatedCount = 0;
 
                 for (ValCursResponseDto.Valute valute : response.currencies()) {
@@ -52,19 +56,24 @@ public class CurrencyRateServiceImpl implements CurrencyRateService {
 
                         String normalizedValue = valute.value().replace(",", ".");
                         BigDecimal rate = new BigDecimal(normalizedValue);
+                        Integer nominal = valute.nominal();
+                        if (nominal == null || nominal <= 0) {
+                            throw new IllegalArgumentException("Некорректный номинал валюты " + code);
+                        }
 
-                        log.debug("Обработка курса: {} = {} RUB", code, rate);
+                        log.debug("Обработка курса: {} {} = {} RUB, дата={}", nominal, code, rate, rateDate);
 
                         CurrencyRate currencyRate = currencyRateRepository
-                                .findByCurrencyIdAndRateDate(currencyId, today)
+                                .findByCurrencyIdAndRateDate(currencyId, rateDate)
                                 .orElseGet(
                                         () -> CurrencyRate.builder()
                                                 .currencyId(currencyId)
-                                                .rateDate(today)
+                                                .rateDate(rateDate)
                                                 .build()
                                 );
 
                         currencyRate.setRate(rate);
+                        currencyRate.setNominal(nominal);
                         currencyRateRepository.save(currencyRate);
 
                         updatedCount++;

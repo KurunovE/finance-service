@@ -1,6 +1,10 @@
 server:
   port: 8081
 
+app:
+  current-user:
+    id: 11111111-1111-1111-1111-111111111111
+
 user:
   service:
     url: http://localhost:9090

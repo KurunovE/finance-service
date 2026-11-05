@@ -76,14 +76,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
-    @ExceptionHandler({
-            MethodArgumentNotValidException.class,
-            HandlerMethodValidationException.class
-    })
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<MappingErrorDto> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
+            String fieldName = error instanceof FieldError fieldError
+                    ? fieldError.getField() : error.getObjectName();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
@@ -95,6 +93,28 @@ public class GlobalExceptionHandler {
                 .details(errors)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<MappingErrorDto> handleMethodValidationException(HandlerMethodValidationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getParameterValidationResults().forEach(result -> {
+            String parameterName = result.getMethodParameter().getParameterName();
+            String key = parameterName != null ? parameterName
+                    : "arg" + result.getMethodParameter().getParameterIndex();
+            result.getResolvableErrors().forEach(error -> {
+                String fieldName = error instanceof FieldError fieldError ? fieldError.getField() : key;
+                errors.put(fieldName, error.getDefaultMessage());
+            });
+        });
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        MappingErrorDto errorDto = MappingErrorDto.builder()
+                .status(status)
+                .message("Ошибка валидации данных")
+                .zonedDateTime(ZonedDateTime.now())
+                .details(errors)
+                .build();
+        return ResponseEntity.status(status).body(errorDto);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

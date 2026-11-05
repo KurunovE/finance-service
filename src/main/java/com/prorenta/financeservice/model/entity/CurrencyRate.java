@@ -25,8 +25,11 @@ public class CurrencyRate {
     @Column(name = "currency_id", nullable = false)
     private UUID currencyId;
 
-    @Column(name = "rate", nullable = false)
+    @Column(name = "rate", nullable = false, precision = 15, scale = 4)
     private BigDecimal rate;
+
+    @Column(name = "nominal")
+    private Integer nominal;
 
     @Column(name = "rate_date", nullable = false)
     private LocalDate rateDate;

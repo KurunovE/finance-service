@@ -3,6 +3,7 @@ CREATE TABLE currency_rates
     id          UUID PRIMARY KEY,
     currency_id UUID                                               NOT NULL,
     rate        NUMERIC(15, 4)                                     NOT NULL CHECK (rate > 0),
+    nominal     INTEGER CHECK (nominal > 0),
     rate_date   DATE                                               NOT NULL,
     created_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 

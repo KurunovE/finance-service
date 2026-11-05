@@ -9,7 +9,6 @@ import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class TransactionFilterSpecification {
@@ -28,12 +27,12 @@ public class TransactionFilterSpecification {
                 predicates.add(criteriaBuilder.equal(categoryJoin.get("name"), categoryName));
             }
 
-            Optional.ofNullable(startCreatedDate)
-                    .map(
-                            startDate -> endCreatedDate == null
-                                    ? criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), startDate)
-                                    : criteriaBuilder.between(root.get("createdDate"), startDate, endCreatedDate)
-                    ).ifPresent(predicates::add);
+            if (startCreatedDate != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), startCreatedDate));
+            }
+            if (endCreatedDate != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdDate"), endCreatedDate));
+            }
 
             predicates.add(criteriaBuilder.equal(root.get("isDeleted"), false));
 

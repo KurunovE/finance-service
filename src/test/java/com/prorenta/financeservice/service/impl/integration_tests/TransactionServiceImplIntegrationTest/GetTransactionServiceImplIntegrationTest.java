@@ -11,6 +11,9 @@ import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +29,28 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
 
     @MockitoBean
     private CurrentUserProvider currentUserProvider;
+
+    @ParameterizedTest
+    @CsvSource({"page,-1", "pageSize,0", "pageSize,101", "pageSize,2147483647"})
+    void invalidPaginationReturnsBadRequest(String parameter, String value) throws Exception {
+        Mockito.when(currentUserProvider.getCurrentUserId()).thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
+        var result = mockMvc.perform(get("/api/v1/transactions").param(parameter, value)).andReturn();
+        Assertions.assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert_transaction_filter_data.sql"})
+    void endDateAloneIsInclusiveAndMaximumPageSizeIsAccepted() throws Exception {
+        Mockito.when(currentUserProvider.getCurrentUserId()).thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
+        var result = mockMvc.perform(get("/api/v1/transactions")
+                .param("endCreatedDate", "2026-08-15")
+                .param("pageSize", "100")).andReturn();
+        Assertions.assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), FilterTransactionsResponseDto.class);
+        Assertions.assertThat(response.countTransactions()).isEqualTo(2);
+        Assertions.assertThat(response.transactions()).extracting(t -> t.createdDate())
+                .containsExactly(LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 15));
+    }
 
     @Test
     @Sql(

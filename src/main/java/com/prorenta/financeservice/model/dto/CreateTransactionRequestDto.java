@@ -18,6 +18,7 @@ public record CreateTransactionRequestDto(
 
         @NotNull(message = "Сумма обязательна")
         @DecimalMin(value = "0.01", message = "Сумма должна быть больше нуля")
+        @Digits(integer = 13, fraction = 2, message = "Сумма должна содержать не более 13 целых и 2 дробных цифр")
         BigDecimal amount,
 
         @Size(max = 50, message = "Название банка не может превышать 50 символов")

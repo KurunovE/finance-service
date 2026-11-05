@@ -11,6 +11,9 @@ import java.util.List;
 @JacksonXmlRootElement(localName = "ValCurs")
 public record ValCursResponseDto (
 
+        @JacksonXmlProperty(localName = "Date", isAttribute = true)
+        String date,
+
         @JacksonXmlProperty(localName = "Valute")
         @JacksonXmlElementWrapper(useWrapping = false)
         List<Valute> currencies
@@ -20,6 +23,9 @@ public record ValCursResponseDto (
 
             @JacksonXmlProperty(localName = "CharCode")
             String charCode,
+
+            @JacksonXmlProperty(localName = "Nominal")
+            Integer nominal,
 
             @JacksonXmlProperty(localName = "Value")
             String value

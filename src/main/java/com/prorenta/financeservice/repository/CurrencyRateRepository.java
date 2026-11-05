@@ -18,7 +18,7 @@ public interface CurrencyRateRepository extends JpaRepository<CurrencyRate, UUID
     Optional<CurrencyRate> findByCurrencyIdAndRateDate(UUID currencyId, LocalDate rateDate);
 
     @Query("""
-            SELECT CurrencyRateDto(cr.rateDate, cr.rate)
+            SELECT new com.prorenta.financeservice.model.dto.CurrencyRateDto(cr.rateDate, cr.rate, cr.nominal)
             FROM CurrencyRate cr
             WHERE cr.currencyId = :currencyId
                 AND cr.rateDate >= :startDate

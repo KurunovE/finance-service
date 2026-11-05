@@ -12,6 +12,9 @@ import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import com.prorenta.financeservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +23,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.time.LocalDate;
+import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
@@ -28,8 +33,42 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     @MockitoBean
     private CurrentUserProvider currentUserProvider;
+
+    static Stream<UpdateTransactionRequestDto> invalidUpdates() {
+        return Stream.of(
+                UpdateTransactionRequestDto.builder().amount(new BigDecimal("-10")).build(),
+                UpdateTransactionRequestDto.builder().amount(BigDecimal.ZERO).build(),
+                UpdateTransactionRequestDto.builder().amount(new BigDecimal("0.014")).build(),
+                UpdateTransactionRequestDto.builder().amount(new BigDecimal("10000000000000")).build(),
+                UpdateTransactionRequestDto.builder().createdDate(LocalDate.now().plusDays(1)).build(),
+                UpdateTransactionRequestDto.builder().bank("x".repeat(51)).build(),
+                UpdateTransactionRequestDto.builder().description("x".repeat(256)).build()
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidUpdates")
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert_transaction_filter_data.sql"})
+    void invalidPatchDoesNotChangeTransaction(UpdateTransactionRequestDto request) throws Exception {
+        UUID id = UUID.fromString("44444444-4444-4444-4444-444444444441");
+        Mockito.when(currentUserProvider.getCurrentUserId()).thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
+
+        MvcResult result = mockMvc.perform(patch("/api/v1/transactions/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))).andReturn();
+
+        Assertions.assertThat(result.getResponse().getStatus()).isEqualTo(400);
+        var transaction = transactionRepository.findById(id).orElseThrow();
+        Assertions.assertThat(transaction.getAmount()).isEqualByComparingTo("100000.00");
+        Assertions.assertThat(transaction.getCreatedDate()).isEqualTo(LocalDate.of(2026, 8, 1));
+        Assertions.assertThat(transaction.getBank()).isEqualTo("T-Bank");
+        Assertions.assertThat(transaction.getDescription()).isEqualTo("ЗП");
+    }
 
     @Test
     @Sql(

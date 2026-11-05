@@ -38,6 +38,8 @@ public class CbrFeignClientIntegrationTest extends AbstractIntegrationTest {
         ValCursResponseDto response = cbrFeignClient.getDailyRates(null);
 
         Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.date()).isEqualTo("01.09.2026");
+        Assertions.assertThat(response.currencies().getFirst().nominal()).isEqualTo(1);
         Assertions.assertThat(response.currencies()).hasSize(1);
         Assertions.assertThat(response.currencies().getFirst().charCode()).isEqualTo("USD");
         Assertions.assertThat(response.currencies().getFirst().value()).isEqualTo("89,5012");

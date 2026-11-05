@@ -12,6 +12,9 @@ import com.prorenta.financeservice.service.impl.CurrencyRateServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -46,14 +49,47 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     @MockitoBean
     private CurrencyRateRepository currencyRateRepository;
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"31.02.2026", "2026-09-01"})
+    void missingOrInvalidDateDoesNotCreateQuotes(String date) {
+        Mockito.when(cbrFeignClient.getDailyRates(null)).thenReturn(ValCursResponseDto.builder()
+                .date(date)
+                .currencies(List.of(ValCursResponseDto.Valute.builder()
+                        .charCode("USD").nominal(1).value("89,5012").build()))
+                .build());
+
+        currencyRateService.aggregateRates();
+
+        Mockito.verifyNoInteractions(currencyRateRepository);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void invalidNominalDoesNotCreateQuote(int nominal) {
+        Mockito.when(cbrFeignClient.getDailyRates(null)).thenReturn(ValCursResponseDto.builder()
+                .date("01.09.2026")
+                .currencies(List.of(ValCursResponseDto.Valute.builder()
+                        .charCode("USD").nominal(nominal).value("89,5012").build()))
+                .build());
+        Mockito.when(currencyService.findByCode("USD"))
+                .thenReturn(Currency.builder().id(UUID.randomUUID()).code("USD").build());
+
+        currencyRateService.aggregateRates();
+
+        Mockito.verifyNoInteractions(currencyRateRepository);
+    }
+
     @Test
     @DisplayName("Агрегация курсов: создание новой записи курса")
     public void aggregateRatesCreateNewRateSuccessfulTest() {
         ValCursResponseDto.Valute usdValute = ValCursResponseDto.Valute.builder()
                 .charCode("USD")
+                .nominal(1)
                 .value("89,5012")
                 .build();
         ValCursResponseDto responseDto = ValCursResponseDto.builder()
+                .date("01.09.2026")
                 .currencies(List.of(usdValute))
                 .build();
 
@@ -64,7 +100,7 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
                 .thenReturn(responseDto);
         Mockito.when(currencyService.findByCode("USD"))
                 .thenReturn(usdCurrency);
-        Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(usdId), Mockito.any(LocalDate.class)))
+        Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(usdId), Mockito.eq(LocalDate.of(2026, 9, 1))))
                 .thenReturn(Optional.empty());
 
         currencyRateService.aggregateRates();
@@ -74,8 +110,9 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
 
         CurrencyRate savedRate = captor.getValue();
         Assertions.assertEquals(usdId, savedRate.getCurrencyId());
-        Assertions.assertEquals(LocalDate.now(), savedRate.getRateDate());
+        Assertions.assertEquals(LocalDate.of(2026, 9, 1), savedRate.getRateDate());
         Assertions.assertEquals(new BigDecimal("89.5012"), savedRate.getRate());
+        Assertions.assertEquals(1, savedRate.getNominal());
     }
 
     @Test
@@ -83,9 +120,11 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     public void aggregateRatesUpdateExistingRateSuccessfulTest() {
         ValCursResponseDto.Valute usdValute = ValCursResponseDto.Valute.builder()
                 .charCode("USD")
+                .nominal(1)
                 .value("91,2500")
                 .build();
         ValCursResponseDto responseDto = ValCursResponseDto.builder()
+                .date("01.09.2026")
                 .currencies(List.of(usdValute))
                 .build();
 
@@ -95,7 +134,7 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
         CurrencyRate existingRate = CurrencyRate.builder()
                 .id(UUID.randomUUID())
                 .currencyId(usdId)
-                .rateDate(LocalDate.now())
+                .rateDate(LocalDate.of(2026, 9, 1))
                 .rate(new BigDecimal("89.5012"))
                 .build();
 
@@ -103,7 +142,7 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
                 .thenReturn(responseDto);
         Mockito.when(currencyService.findByCode("USD"))
                 .thenReturn(usdCurrency);
-        Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(usdId), Mockito.any(LocalDate.class)))
+        Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(usdId), Mockito.eq(LocalDate.of(2026, 9, 1))))
                 .thenReturn(Optional.of(existingRate));
 
         currencyRateService.aggregateRates();
@@ -121,13 +160,16 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     public void aggregateRatesSkipUnknownCurrencyTest() {
         ValCursResponseDto.Valute unknownValute = ValCursResponseDto.Valute.builder()
                 .charCode("XYZ")
+                .nominal(1)
                 .value("10,0000")
                 .build();
         ValCursResponseDto.Valute validValute = ValCursResponseDto.Valute.builder()
                 .charCode("EUR")
+                .nominal(1)
                 .value("98,2030")
                 .build();
         ValCursResponseDto responseDto = ValCursResponseDto.builder()
+                .date("01.09.2026")
                 .currencies(List.of(unknownValute, validValute))
                 .build();
 
@@ -140,7 +182,7 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
                 .thenThrow(new CurrencyNotFoundException("Валюта с кодом=XYZ не найдена"));
         Mockito.when(currencyService.findByCode("EUR"))
                 .thenReturn(eurCurrency);
-        Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(eurId), Mockito.any(LocalDate.class)))
+        Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(eurId), Mockito.eq(LocalDate.of(2026, 9, 1))))
                 .thenReturn(Optional.empty());
 
         currencyRateService.aggregateRates();

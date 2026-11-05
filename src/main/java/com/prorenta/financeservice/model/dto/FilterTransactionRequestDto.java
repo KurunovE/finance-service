@@ -1,6 +1,8 @@
 package com.prorenta.financeservice.model.dto;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -11,7 +13,10 @@ public record FilterTransactionRequestDto(
         String categoryName,
         LocalDate startCreatedDate,
         LocalDate endCreatedDate,
+        @Min(value = 0, message = "Номер страницы не может быть отрицательным")
         Integer page,
+        @Min(value = 1, message = "Размер страницы должен быть положительным")
+        @Max(value = 100, message = "Размер страницы не может превышать 100")
         Integer pageSize,
         String sortDirection,
         String fieldSort
@@ -25,7 +30,7 @@ public record FilterTransactionRequestDto(
         if (fieldSort == null) fieldSort = "createdDate";
     }
 
-    @AssertTrue(message = "Дата начала поиска должна быть раньше даты окончания")
+    @AssertTrue(message = "Дата начала поиска не должна быть позже даты окончания")
     public boolean isValidPeriod() {
         if (startCreatedDate == null || endCreatedDate == null) {
             return true;
@@ -33,7 +38,7 @@ public record FilterTransactionRequestDto(
         return !startCreatedDate.isAfter(endCreatedDate);
     }
 
-    @AssertTrue(message = "Направление сортировки должнобыть 'asc' или 'desc'")
+    @AssertTrue(message = "Направление сортировки должно быть 'asc' или 'desc'")
     public boolean isValidSortDirection() {
         return "asc".equalsIgnoreCase(sortDirection) || "desc".equalsIgnoreCase(sortDirection);
     }
