@@ -27,13 +27,16 @@ public class CategoryControllerImpl implements CategoryController {
         log.debug("Запрос на создание категории: userId={}, name={}, type={}",
                 currentUserProvider.getCurrentUserId(), request.name(), request.type());
         CategoryResponseDto category = categoryService.createCategory(request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
     @Override
     public ResponseEntity<GetAllCategoriesResponseDto> getCategories() {
         log.debug("Запрос на получение категорий: userId={}", currentUserProvider.getCurrentUserId());
+
         GetAllCategoriesResponseDto categories = categoryService.getCurrentUserCategories();
+
         return ResponseEntity.ok(categories);
     }
 
@@ -42,6 +45,7 @@ public class CategoryControllerImpl implements CategoryController {
         log.debug("Запрос на удаление категории: userId={}, categoryId={}",
                 currentUserProvider.getCurrentUserId(), categoryId);
         categoryService.softRemoveCategory(categoryId);
+
         return ResponseEntity.noContent().build();
     }
 }

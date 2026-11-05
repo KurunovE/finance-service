@@ -39,16 +39,19 @@ public class RemoveCategoryServiceImplIntegrationTest extends AbstractIntegratio
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Удаление категории: мягкое удаление и проверка скрытия из БД")
+    @DisplayName("Мягкое удаление категории")
     public void softDeleteCategoryIntegrationTest() {
+        // Given
         UUID categoryId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult deleteResult = mockMvc.perform(delete("/api/v1/categories/{categoryId}", categoryId))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(deleteResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 

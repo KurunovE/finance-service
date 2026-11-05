@@ -33,12 +33,16 @@ public class GetCurrencyServiceImplCacheIntegrationTest extends AbstractIntegrat
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
-    @DisplayName("Получение валюты: кэширование списка валют (all_currencies)")
+    @DisplayName("Кэширование списка валют")
     public void getCurrenciesCacheTest() {
+        // Given: данные подготовлены конфигурацией теста
+
+        // When
         currencyService.getCurrencies();
         currencyService.getCurrencies();
         currencyService.getCurrencies();
 
+        // Then
         Mockito.verify(currencyRepository, Mockito.times(1))
                 .findAllActiveCurrencies();
     }
@@ -51,14 +55,17 @@ public class GetCurrencyServiceImplCacheIntegrationTest extends AbstractIntegrat
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
-    @DisplayName("Получение валюты: кэширование валюты по ID (currency_dto_by_id)")
+    @DisplayName("Кэширование валюты по ID")
     public void getCurrencyByIdCacheTest() {
+        // Given
         UUID currencyId = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
+        // When
         currencyService.getCurrency(currencyId);
         currencyService.getCurrency(currencyId);
         currencyService.getCurrency(currencyId);
 
+        // Then
         Mockito.verify(currencyRepository, Mockito.times(1))
                 .findById(currencyId);
     }
@@ -71,14 +78,17 @@ public class GetCurrencyServiceImplCacheIntegrationTest extends AbstractIntegrat
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
-    @DisplayName("Получение валюты: кэширование валюты по коду (currencies_by_code)")
+    @DisplayName("Кэширование валюты по коду")
     public void getCurrencyByCodeCacheTest() {
+        // Given
         String code = "RUB";
 
+        // When
         currencyService.findByCode(code);
         currencyService.findByCode(code);
         currencyService.findByCode(code);
 
+        // Then
         Mockito.verify(currencyRepository, Mockito.times(1))
                 .findByCode(code);
     }

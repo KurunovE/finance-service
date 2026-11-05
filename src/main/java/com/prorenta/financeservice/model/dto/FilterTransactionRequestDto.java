@@ -25,8 +25,11 @@ public record FilterTransactionRequestDto(
 
     public FilterTransactionRequestDto {
         if (page == null) page = 0;
+
         if (pageSize == null) pageSize = 10;
+
         if (sortDirection == null) sortDirection = "asc";
+
         if (fieldSort == null) fieldSort = "createdDate";
     }
 
@@ -35,6 +38,7 @@ public record FilterTransactionRequestDto(
         if (startCreatedDate == null || endCreatedDate == null) {
             return true;
         }
+
         return !startCreatedDate.isAfter(endCreatedDate);
     }
 

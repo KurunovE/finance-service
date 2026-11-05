@@ -40,6 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponseDto createTransaction(CreateTransactionRequestDto dto) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Создание транзакции: userId={}", userId);
 
         Category category = categoryService.findAvailableCategoryById(dto.categoryId());
@@ -58,6 +59,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
+
         log.info("Транзакция успешно сохранена: transactionId={}, userId={}", savedTransaction.getId(), userId);
 
         return transactionMapper.mapTransactionToTransactionResponseDto(savedTransaction);
@@ -67,6 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public FilterTransactionsResponseDto getTransactions(FilterTransactionRequestDto dto) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Получение списка транзакций: userId={}, filters={}", userId, dto);
 
         Pageable pageable = PageRequest.of(
@@ -83,6 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         Page<Transaction> response = transactionRepository.findAll(specification, pageable);
+
         log.debug("Найдено {} транзакций. {} страница из {}, userId={}",
                 response.getTotalElements(), response.getNumber(), response.getTotalPages(), userId);
 
@@ -103,37 +107,51 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponseDto updateTransaction(UUID transactionId, UpdateTransactionRequestDto dto) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Обновление транзакции: transactionId={}, userId={}", transactionId, userId);
+
         Transaction transaction = transactionRepository.findActiveTransactionByIdAndUserId(transactionId, userId).orElseThrow(
                 () -> new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена")
         );
 
         if (dto.categoryId() != null) {
             Category category = categoryService.findAvailableCategoryById(dto.categoryId());
+
             if (!transaction.getUserId().equals(category.getUserId())) {
                 throw new CategoryNotFoundException("Категория с id=" + dto.categoryId() + " не найдена");
             }
+
             log.debug("Загружена категория: categoryId={}, userId={}", category.getId(), userId);
+
             transaction.setCategory(category);
         }
+
         if (dto.currencyId() != null) {
             Currency currency = currencyService.findById(dto.currencyId());
+
             log.debug("Загружена валюта: currencyId={}, userId={}", currency.getId(), userId);
+
             transaction.setCurrency(currency);
         }
+
         if (dto.amount() != null) {
             transaction.setAmount(dto.amount());
         }
+
         if (dto.bank() != null) {
             transaction.setBank(dto.bank());
         }
+
         if (dto.description() != null) {
             transaction.setDescription(dto.description());
         }
+
         if (dto.createdDate() != null) {
             transaction.setCreatedDate(dto.createdDate());
         }
+
         Transaction savedTransaction = transactionRepository.save(transaction);
+
         log.info("Транзакция успешно обновлена: transactionId={}, userId={}", savedTransaction.getId(), userId);
 
         return transactionMapper.mapTransactionToTransactionResponseDto(savedTransaction);
@@ -143,10 +161,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void softRemoveTransaction(UUID transactionId) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Удаление транзакции: transactionId={}, userId={}", transactionId, userId);
+
         if (transactionRepository.softRemoveTransaction(transactionId, userId) == 0) {
             throw new TransactionNotFoundException("Транзакция с id=" + transactionId + " не найдена");
         }
+
         log.info("Успешное удаление транзакции: transactionId={}, userId={}", transactionId, userId);
     }
 }

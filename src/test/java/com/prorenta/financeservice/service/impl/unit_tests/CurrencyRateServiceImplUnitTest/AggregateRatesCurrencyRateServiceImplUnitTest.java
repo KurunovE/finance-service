@@ -52,21 +52,27 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"31.02.2026", "2026-09-01"})
+    @DisplayName("Некорректная дата курса отклоняется")
     void missingOrInvalidDateDoesNotCreateQuotes(String date) {
+        // Given
         Mockito.when(cbrFeignClient.getDailyRates(null)).thenReturn(ValCursResponseDto.builder()
                 .date(date)
                 .currencies(List.of(ValCursResponseDto.Valute.builder()
                         .charCode("USD").nominal(1).value("89,5012").build()))
                 .build());
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         Mockito.verifyNoInteractions(currencyRateRepository);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1})
+    @DisplayName("Некорректный номинал отклоняется")
     void invalidNominalDoesNotCreateQuote(int nominal) {
+        // Given
         Mockito.when(cbrFeignClient.getDailyRates(null)).thenReturn(ValCursResponseDto.builder()
                 .date("01.09.2026")
                 .currencies(List.of(ValCursResponseDto.Valute.builder()
@@ -75,14 +81,17 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
         Mockito.when(currencyService.findByCode("USD"))
                 .thenReturn(Currency.builder().id(UUID.randomUUID()).code("USD").build());
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         Mockito.verifyNoInteractions(currencyRateRepository);
     }
 
     @Test
     @DisplayName("Агрегация курсов: создание новой записи курса")
     public void aggregateRatesCreateNewRateSuccessfulTest() {
+        // Given
         ValCursResponseDto.Valute usdValute = ValCursResponseDto.Valute.builder()
                 .charCode("USD")
                 .nominal(1)
@@ -103,8 +112,10 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
         Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(usdId), Mockito.eq(LocalDate.of(2026, 9, 1))))
                 .thenReturn(Optional.empty());
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         ArgumentCaptor<CurrencyRate> captor = ArgumentCaptor.forClass(CurrencyRate.class);
         Mockito.verify(currencyRateRepository, Mockito.times(1)).save(captor.capture());
 
@@ -116,8 +127,9 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     }
 
     @Test
-    @DisplayName("Агрегация курсов: обновление существующего курса за текущий день")
+    @DisplayName("Агрегация курсов: обновление записи")
     public void aggregateRatesUpdateExistingRateSuccessfulTest() {
+        // Given
         ValCursResponseDto.Valute usdValute = ValCursResponseDto.Valute.builder()
                 .charCode("USD")
                 .nominal(1)
@@ -145,8 +157,10 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
         Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(usdId), Mockito.eq(LocalDate.of(2026, 9, 1))))
                 .thenReturn(Optional.of(existingRate));
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         ArgumentCaptor<CurrencyRate> captor = ArgumentCaptor.forClass(CurrencyRate.class);
         Mockito.verify(currencyRateRepository, Mockito.times(1)).save(captor.capture());
 
@@ -156,8 +170,9 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     }
 
     @Test
-    @DisplayName("Агрегация курсов: пропуск неизвестных валют без прерывания цикла")
+    @DisplayName("Агрегация курсов: неизвестная валюта")
     public void aggregateRatesSkipUnknownCurrencyTest() {
+        // Given
         ValCursResponseDto.Valute unknownValute = ValCursResponseDto.Valute.builder()
                 .charCode("XYZ")
                 .nominal(1)
@@ -185,8 +200,10 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
         Mockito.when(currencyRateRepository.findByCurrencyIdAndRateDate(Mockito.eq(eurId), Mockito.eq(LocalDate.of(2026, 9, 1))))
                 .thenReturn(Optional.empty());
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         ArgumentCaptor<CurrencyRate> captor = ArgumentCaptor.forClass(CurrencyRate.class);
         Mockito.verify(currencyRateRepository, Mockito.times(1)).save(captor.capture());
 
@@ -196,25 +213,31 @@ public class AggregateRatesCurrencyRateServiceImplUnitTest {
     }
 
     @Test
-    @DisplayName("Агрегация курсов: безопасное завершение при null от клиента")
+    @DisplayName("Агрегация курсов: пустой ответ")
     public void aggregateRatesNullResponseTest() {
+        // Given
         Mockito.when(cbrFeignClient.getDailyRates(null))
                 .thenReturn(null);
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         Mockito.verifyNoInteractions(currencyService);
         Mockito.verifyNoInteractions(currencyRateRepository);
     }
 
     @Test
-    @DisplayName("Агрегация курсов: перехват сетевой ошибки от Feign-клиента")
+    @DisplayName("Агрегация курсов: сетевая ошибка")
     public void aggregateRatesFeignClientExceptionTest() {
+        // Given
         Mockito.when(cbrFeignClient.getDailyRates(null))
                 .thenThrow(new RuntimeException("CBR API connection timeout"));
 
+        // When
         Assertions.assertDoesNotThrow(() -> currencyRateService.aggregateRates());
 
+        // Then
         Mockito.verifyNoInteractions(currencyService);
         Mockito.verifyNoInteractions(currencyRateRepository);
     }

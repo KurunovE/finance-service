@@ -39,16 +39,19 @@ public class RemoveTransactionServiceImplIntegrationTest extends AbstractIntegra
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Удаление транзакции: мягкое удаление транзакции и проверка её скрытия из БД")
+    @DisplayName("Мягкое удаление транзакции")
     public void softDeleteTransactionIntegrationTest() {
+        // Given
         UUID transactionId = UUID.fromString("44444444-4444-4444-4444-444444444441");
 
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult deleteResult = mockMvc.perform(delete("/api/v1/transactions/{id}", transactionId))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(deleteResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 

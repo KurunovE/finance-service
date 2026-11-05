@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "15m")
 public class SchedulingConfig {
+
     @Bean
     public LockProvider lockProvider(DataSource dataSource) {
         return new JdbcTemplateLockProvider(

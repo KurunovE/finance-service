@@ -41,13 +41,16 @@ public class GetCurrencyServiceImplUnitTest {
     @Test
     @DisplayName("Получение валюты по ID: успешно")
     public void getCurrencySuccessfulTest() {
+        // Given
         Currency currency = createDefaultCurrency();
 
         Mockito.when(currencyRepository.findById(DEFAULT_CURRENCY_ID))
                 .thenReturn(Optional.of(currency));
 
+        // When
         CurrencyResponseDto actual = currencyService.getCurrency(DEFAULT_CURRENCY_ID);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(currency.getId(), actual.id());
         Assertions.assertEquals(currency.getCode(), actual.code());
@@ -57,29 +60,35 @@ public class GetCurrencyServiceImplUnitTest {
     @Test
     @DisplayName("Получение валюты по ID: валюта не найдена")
     public void getCurrencyNotFoundTest() {
+        // Given
         String expectedMessage = "Валюта с id=" + DEFAULT_CURRENCY_ID + " не найдена";
 
         Mockito.when(currencyRepository.findById(DEFAULT_CURRENCY_ID))
                 .thenReturn(Optional.empty());
 
+        // When
         CurrencyNotFoundException thrown = Assertions.assertThrows(
                 CurrencyNotFoundException.class,
                 () -> currencyService.getCurrency(DEFAULT_CURRENCY_ID)
         );
 
+        // Then
         Assertions.assertEquals(expectedMessage, thrown.getMessage());
     }
 
     @Test
     @DisplayName("Получение списка валют: успешно (список не пуст)")
     public void getCurrenciesSuccessfulTest() {
+        // Given
         Currency currency = createDefaultCurrency();
 
         Mockito.when(currencyRepository.findAllActiveCurrencies())
                 .thenReturn(List.of(currency));
 
+        // When
         ListCurrenciesResponseDto actual = currencyService.getCurrencies();
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertNotNull(actual.currencies());
         Assertions.assertEquals(1, actual.currencies().size());
@@ -89,11 +98,14 @@ public class GetCurrencyServiceImplUnitTest {
     @Test
     @DisplayName("Получение списка валют: пустой список")
     public void getCurrenciesEmptyListTest() {
+        // Given
         Mockito.when(currencyRepository.findAllActiveCurrencies())
                 .thenReturn(List.of());
 
+        // When
         ListCurrenciesResponseDto actual = currencyService.getCurrencies();
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertNotNull(actual.currencies());
         Assertions.assertTrue(actual.currencies().isEmpty());

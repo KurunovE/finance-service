@@ -44,6 +44,7 @@ public class FindCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Поиск категории по id: успешно")
     public void findCategoryByIdSuccessfulTest() {
+        // Given
         UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
         Category expected = createDefaultCategory(userId);
 
@@ -52,8 +53,10 @@ public class FindCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.findByIdAndUserIdAndIsDeletedFalse(Mockito.any(UUID.class), Mockito.eq(UserInfoDataFactory.DEFAULT_USER_ID)))
                 .thenReturn(Optional.ofNullable(expected));
 
+        // When
         Category actual = categoryService.findAvailableCategoryById(DEFAULT_CATEGORY_ID);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(DEFAULT_CATEGORY_ID, actual.getId());
         Assertions.assertEquals(expected, actual);
@@ -62,6 +65,7 @@ public class FindCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Поиск категории по id: категория не найдена")
     public void findCategoryByIdCategoryNotFoundTest() {
+        // Given
         String message = "Категория с id=" + DEFAULT_CATEGORY_ID + " не найдена";
 
         Mockito.when(currentUserProvider.getCurrentUserId())
@@ -69,11 +73,13 @@ public class FindCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.findByIdAndUserIdAndIsDeletedFalse(Mockito.any(UUID.class), Mockito.eq(UserInfoDataFactory.DEFAULT_USER_ID)))
                 .thenReturn(Optional.empty());
 
+        // When
         CategoryNotFoundException thrown = Assertions.assertThrows(
                 CategoryNotFoundException.class,
                 () -> categoryService.findAvailableCategoryById(DEFAULT_CATEGORY_ID)
         );
 
+        // Then
         Assertions.assertEquals(message, thrown.getMessage());
     }
 }

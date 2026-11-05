@@ -56,6 +56,7 @@ public class RemoveTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Мягкое удаление транзакции: успешно (HTTP 204)")
     public void softRemoveTransactionSuccessfully() {
+        // Given
         UUID transactionId = UUID.randomUUID();
 
         Mockito.when(currentUserProvider.getCurrentUserId())
@@ -63,9 +64,11 @@ public class RemoveTransactionServiceImplModuleTest {
         Mockito.when(transactionRepository.softRemoveTransaction(transactionId, currentUserProvider.getCurrentUserId()))
                 .thenReturn(1);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(delete("/api/v1/transactions/{id}", transactionId))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 
@@ -76,12 +79,15 @@ public class RemoveTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Удаление транзакции: ошибка 400 (Невалидный формат UUID)")
     public void softRemoveTransactionInvalidUuidFormat() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(delete("/api/v1/transactions/{id}", "invalid-uuid"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 

@@ -73,6 +73,7 @@ public class CreateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Создание транзакции: успешно")
     public void createTransactionSuccessfully() {
+        // Given
         UserInfoDto userInfoDto = UserInfoDataFactory.createDefaultUserInfoDto();
         Category category = CategoryDataFactory.createDefaultCategory(userInfoDto.userId());
         Currency currency = CurrencyDataFactory.createDefaultCurrency();
@@ -90,12 +91,14 @@ public class CreateTransactionServiceImplModuleTest {
         Mockito.when(transactionRepository.save(Mockito.any(Transaction.class)))
                 .thenReturn(savedTransaction);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         TransactionResponseDto actual = objectMapper.readValue(responseContent, TransactionResponseDto.class);
 
@@ -111,6 +114,7 @@ public class CreateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Создание транзакции: ошибка валидации DTO")
     public void createTransactionWithValidationException() {
+        // Given
         CreateTransactionRequestDto requestDto = CreateTransactionRequestDto.builder()
                 .categoryId(UUID.randomUUID())
                 .currencyId(UUID.randomUUID())
@@ -121,12 +125,14 @@ public class CreateTransactionServiceImplModuleTest {
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 
@@ -137,6 +143,7 @@ public class CreateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Создание транзакции: категория не найдена")
     public void createTransactionCategoryNotFound() {
+        // Given
         UserInfoDto userInfoDto = UserInfoDataFactory.createDefaultUserInfoDto();
         Category category = CategoryDataFactory.createDefaultCategory(userInfoDto.userId());
         Currency currency = CurrencyDataFactory.createDefaultCurrency();
@@ -155,12 +162,14 @@ public class CreateTransactionServiceImplModuleTest {
         Mockito.when(categoryService.findAvailableCategoryById(Mockito.any(UUID.class)))
                 .thenThrow(new CategoryNotFoundException(message));
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         ErrorDto actual = objectMapper.readValue(responseContent, ErrorDto.class);
 
@@ -176,6 +185,7 @@ public class CreateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Создание транзакции: нечитаемый JSON / несовпадение типов")
     public void createTransactionWithUnreadableJson() {
+        // Given
         String invalidJson = """
                 {
                   "userId": "11111111-1111-1111-1111-111111111111",
@@ -189,12 +199,14 @@ public class CreateTransactionServiceImplModuleTest {
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
                         .content(invalidJson)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 

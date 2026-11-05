@@ -55,8 +55,9 @@ public class GetCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Получение заполненого списка категорий: успешно")
+    @DisplayName("Получение списка категорий")
     public void getAllCategoriesByUserIdSuccessfully() {
+        // Given
         UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
         Category category = CategoryDataFactory.createDefaultCategory(userId);
 
@@ -65,11 +66,13 @@ public class GetCategoryServiceImplModuleTest {
         Mockito.when(categoryRepository.findAllByUserId(Mockito.any(UUID.class)))
                 .thenReturn(List.of(category));
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         GetAllCategoriesResponseDto actual = objectMapper.readValue(
@@ -93,18 +96,21 @@ public class GetCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Получение пустого списка категорий: успешно")
+    @DisplayName("Пустой список категорий")
     public void getAllCategoriesByUserIdEmptyList() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
         Mockito.when(categoryRepository.findAllByUserId(Mockito.any(UUID.class)))
                 .thenReturn(List.of());
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         GetAllCategoriesResponseDto actual = objectMapper.readValue(
@@ -122,16 +128,19 @@ public class GetCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Получение категорий: маршрут с завершающим слешем не существует")
+    @DisplayName("Завершающий слеш: ошибка 404")
     public void getAllCategoriesMissingUserIdParam() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NOT_FOUND.value());
 
@@ -140,18 +149,21 @@ public class GetCategoryServiceImplModuleTest {
 
     @Test
     @SneakyThrows
-    @DisplayName("Получение категорий: старый маршрут выбора пользователя недоступен")
+    @DisplayName("Старый маршрут категорий недоступен")
     public void cannotSelectUserThroughLegacyCategoryRoute() {
+        // Given
         String invalidUuid = "12345-invalid-string";
 
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories/" + invalidUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.METHOD_NOT_ALLOWED.value());
 

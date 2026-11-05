@@ -28,18 +28,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CurrencyRateServiceImpl implements CurrencyRateService {
 
+    private static final int YEARS_LIMIT = 5;
+    private static final DateTimeFormatter CBR_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT);
+
     private final CbrFeignClient cbrFeignClient;
     private final CurrencyService currencyService;
     private final CurrencyRateRepository currencyRateRepository;
-
-    private static final int YEARS_LIMIT = 5;
-    private static final DateTimeFormatter CBR_DATE_FORMAT = DateTimeFormatter
-            .ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     @Override
     @Transactional
     public void aggregateRates() {
         log.debug("Начало синхронизации курсов валют");
+
         try {
             ValCursResponseDto response = cbrFeignClient.getDailyRates(null);
 
@@ -57,6 +57,7 @@ public class CurrencyRateServiceImpl implements CurrencyRateService {
                         String normalizedValue = valute.value().replace(",", ".");
                         BigDecimal rate = new BigDecimal(normalizedValue);
                         Integer nominal = valute.nominal();
+
                         if (nominal == null || nominal <= 0) {
                             throw new IllegalArgumentException("Некорректный номинал валюты " + code);
                         }
@@ -82,6 +83,7 @@ public class CurrencyRateServiceImpl implements CurrencyRateService {
                         log.trace("Валюта {} пропущена, так как отсутствует в справочнике", code);
                     }
                 }
+
                 log.info("Успешно агрегировано и сохранено {} курсов валют", updatedCount);
             } else {
                 log.warn("Пустой ответ или данные недоступны");
@@ -119,7 +121,9 @@ public class CurrencyRateServiceImpl implements CurrencyRateService {
                 startDate,
                 endDate
         );
+
         log.debug("Список курсов валют загружен: size={}", currencyResponseDtoList.size());
+
         return ListCurrencyRatesResponseDto.builder()
                 .rates(currencyResponseDtoList)
                 .build();

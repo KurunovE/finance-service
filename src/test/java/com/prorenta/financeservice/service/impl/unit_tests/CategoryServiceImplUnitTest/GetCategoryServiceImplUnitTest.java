@@ -44,6 +44,7 @@ public class GetCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Получение всех категорий пользователя: успешно (список не пуст)")
     public void getAllCategoriesByUserIdSuccessfulTest() {
+        // Given
         UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
         Category category = createDefaultCategory(userId);
 
@@ -52,8 +53,10 @@ public class GetCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.findAllByUserId(userId))
                 .thenReturn(List.of(category));
 
+        // When
         GetAllCategoriesResponseDto actual = categoryService.getCurrentUserCategories();
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertNotNull(actual.categories());
         Assertions.assertEquals(1, actual.categories().size());
@@ -63,6 +66,7 @@ public class GetCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Получение всех категорий пользователя: пустой список")
     public void getAllCategoriesByUserIdEmptyListTest() {
+        // Given
         UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
 
         Mockito.when(currentUserProvider.getCurrentUserId())
@@ -70,8 +74,10 @@ public class GetCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.findAllByUserId(userId))
                 .thenReturn(List.of());
 
+        // When
         GetAllCategoriesResponseDto actual = categoryService.getCurrentUserCategories();
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertNotNull(actual.categories());
         Assertions.assertTrue(actual.categories().isEmpty());

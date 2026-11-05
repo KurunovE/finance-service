@@ -25,6 +25,7 @@ public class CurrencyRatesScheduler {
     )
     public void scheduleCurrencySync() {
         log.info("Захвачена блокировка ShedLock. Синхронизация курсов валют");
+
         try {
             currencyRateService.aggregateRates();
         } catch (Exception e) {

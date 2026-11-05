@@ -61,6 +61,7 @@ public class UpdateTransactionServiceImplUnitTest {
     @Test
     @DisplayName("Обновление транзакции: успешно")
     public void updateTransactionSuccessfulTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -83,8 +84,10 @@ public class UpdateTransactionServiceImplUnitTest {
         Mockito.when(transactionRepository.save(Mockito.any(Transaction.class)))
                 .thenReturn(existingTransaction);
 
+        // When
         TransactionResponseDto actual = transactionService.updateTransaction(transactionId, requestDto);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(BigDecimal.valueOf(150.0), actual.amount());
         Assertions.assertEquals("Новое описание", actual.description());
@@ -94,6 +97,7 @@ public class UpdateTransactionServiceImplUnitTest {
     @Test
     @DisplayName("Обновление транзакции: транзакция не найдена")
     public void updateTransactionTransactionNotFoundTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -104,17 +108,20 @@ public class UpdateTransactionServiceImplUnitTest {
         Mockito.when(transactionRepository.findActiveTransactionByIdAndUserId(transactionId, currentUserProvider.getCurrentUserId()))
                 .thenReturn(java.util.Optional.empty());
 
+        // When
         TransactionNotFoundException thrown = Assertions.assertThrows(
                 TransactionNotFoundException.class,
                 () -> transactionService.updateTransaction(transactionId, requestDto)
         );
 
+        // Then
         Assertions.assertEquals(message, thrown.getMessage());
     }
 
     @Test
     @DisplayName("Обновление транзакции: категория не найдена")
     public void updateTransactionCategoryNotFoundTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -133,17 +140,20 @@ public class UpdateTransactionServiceImplUnitTest {
         Mockito.when(categoryService.findAvailableCategoryById(wrongCategoryId))
                 .thenThrow(new CategoryNotFoundException(message));
 
+        // When
         CategoryNotFoundException thrown = Assertions.assertThrows(
                 CategoryNotFoundException.class,
                 () -> transactionService.updateTransaction(existingTransaction.getId(), requestDto)
         );
 
+        // Then
         Assertions.assertEquals(message, thrown.getMessage());
     }
 
     @Test
     @DisplayName("Обновление транзакции: валюта не найдена")
     public void updateTransactionCurrencyNotFoundTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -164,17 +174,20 @@ public class UpdateTransactionServiceImplUnitTest {
         Mockito.when(currencyService.findById(wrongCurrencyId))
                 .thenThrow(new CurrencyNotFoundException(message));
 
+        // When
         CurrencyNotFoundException thrown = Assertions.assertThrows(
                 CurrencyNotFoundException.class,
                 () -> transactionService.updateTransaction(existingTransaction.getId(), requestDto)
         );
 
+        // Then
         Assertions.assertEquals(message, thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Обновление транзакции: категория принадлежит другому пользователю")
+    @DisplayName("Обновление транзакции с чужой категорией")
     public void updateTransactionCategoryBelongsToAnotherUserTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -196,11 +209,13 @@ public class UpdateTransactionServiceImplUnitTest {
         Mockito.when(categoryService.findAvailableCategoryById(requestDto.categoryId()))
                 .thenReturn(categoryUserB);
 
+        // When
         CategoryNotFoundException thrown = Assertions.assertThrows(
                 CategoryNotFoundException.class,
                 () -> transactionService.updateTransaction(existingTransaction.getId(), requestDto)
         );
 
+        // Then
         Assertions.assertEquals(expectedMessage, thrown.getMessage());
         Mockito.verify(transactionRepository, Mockito.never()).save(Mockito.any(Transaction.class));
     }
@@ -208,6 +223,7 @@ public class UpdateTransactionServiceImplUnitTest {
     @Test
     @DisplayName("Обновление транзакции: пустой DTO")
     public void updateTransactionEmptyDtoTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -222,11 +238,13 @@ public class UpdateTransactionServiceImplUnitTest {
         Mockito.when(transactionRepository.save(Mockito.any(Transaction.class)))
                 .thenReturn(existingTransaction);
 
+        // When
         TransactionResponseDto actual = transactionService.updateTransaction(
                 existingTransaction.getId(),
                 emptyRequestDto
         );
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(existingTransaction.getAmount(), actual.amount());
     }

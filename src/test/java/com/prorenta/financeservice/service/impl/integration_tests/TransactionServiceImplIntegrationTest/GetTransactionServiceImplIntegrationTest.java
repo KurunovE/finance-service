@@ -1,6 +1,7 @@
 package com.prorenta.financeservice.service.impl.integration_tests.TransactionServiceImplIntegrationTest;
 
 import com.prorenta.financeservice.factory.UserInfoDataFactory;
+import com.prorenta.financeservice.model.dto.TransactionResponseDto;
 import org.mockito.Mockito;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.prorenta.financeservice.security.CurrentUserProvider;
@@ -32,23 +33,40 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
 
     @ParameterizedTest
     @CsvSource({"page,-1", "pageSize,0", "pageSize,101", "pageSize,2147483647"})
+    @DisplayName("Некорректная пагинация: ошибка 400")
     void invalidPaginationReturnsBadRequest(String parameter, String value) throws Exception {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId()).thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
+
+        // When
         var result = mockMvc.perform(get("/api/v1/transactions").param(parameter, value)).andReturn();
+
+        // Then
         Assertions.assertThat(result.getResponse().getStatus()).isEqualTo(400);
     }
 
     @Test
-    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert_transaction_filter_data.sql"})
+    @Sql(
+            scripts = {
+                    "/sql/cleanup.sql",
+                    "/sql/insert_transaction_filter_data.sql"
+            }
+    )
+    @DisplayName("Конечная дата включительна, размер страницы 100")
     void endDateAloneIsInclusiveAndMaximumPageSizeIsAccepted() throws Exception {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId()).thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
+
+        // When
         var result = mockMvc.perform(get("/api/v1/transactions")
                 .param("endCreatedDate", "2026-08-15")
                 .param("pageSize", "100")).andReturn();
+
+        // Then
         Assertions.assertThat(result.getResponse().getStatus()).isEqualTo(200);
         var response = objectMapper.readValue(result.getResponse().getContentAsString(), FilterTransactionsResponseDto.class);
         Assertions.assertThat(response.countTransactions()).isEqualTo(2);
-        Assertions.assertThat(response.transactions()).extracting(t -> t.createdDate())
+        Assertions.assertThat(response.transactions()).extracting(TransactionResponseDto::createdDate)
                 .containsExactly(LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 15));
     }
 
@@ -63,14 +81,17 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
     @SneakyThrows
     @DisplayName("Получение транзакции: фильтрация без параметров")
     public void getAllActiveTransactionsTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         FilterTransactionsResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -93,17 +114,20 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Получение транзакции: фильтрация строго по имени категории")
+    @DisplayName("Фильтрация транзакций по категории")
     public void getTransactionsByCategoryNameTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("categoryName", "Продукты")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         FilterTransactionsResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -129,11 +153,13 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Получение транзакции: фильтрация по диапазону дат с пагинацией и сортировкой")
+    @DisplayName("Фильтрация транзакций по датам")
     public void getTransactionsByDateRangeTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("startCreatedDate", "2026-08-01")
                         .param("endCreatedDate", "2026-08-31")
@@ -142,6 +168,7 @@ public class GetTransactionServiceImplIntegrationTest extends AbstractIntegratio
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         FilterTransactionsResponseDto actual = objectMapper.readValue(
                 responseContent,

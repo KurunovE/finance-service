@@ -25,14 +25,18 @@ public class CurrencyControllerImpl implements CurrencyController {
     @Override
     public ResponseEntity<ListCurrenciesResponseDto> getCurrencies() {
         log.debug("Запрос на получение всех валют");
+
         ListCurrenciesResponseDto listCurrenciesResponseDto = currencyService.getCurrencies();
+
         return ResponseEntity.ok(listCurrenciesResponseDto);
     }
 
     @Override
     public ResponseEntity<CurrencyResponseDto> getCurrency(UUID currencyId) {
         log.debug("Запрос на получение валюты: currencyId={}", currencyId);
+
         CurrencyResponseDto currencyResponseDto = currencyService.getCurrency(currencyId);
+
         return ResponseEntity.ok(currencyResponseDto);
     }
 
@@ -49,6 +53,7 @@ public class CurrencyControllerImpl implements CurrencyController {
                 startDate,
                 endDate
         );
+
         return ResponseEntity.ok(listCurrencyRatesResponseDto);
     }
 }

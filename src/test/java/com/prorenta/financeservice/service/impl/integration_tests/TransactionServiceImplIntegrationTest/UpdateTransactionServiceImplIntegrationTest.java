@@ -54,14 +54,18 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @ParameterizedTest
     @MethodSource("invalidUpdates")
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert_transaction_filter_data.sql"})
+    @DisplayName("Некорректное обновление сохраняет транзакцию")
     void invalidPatchDoesNotChangeTransaction(UpdateTransactionRequestDto request) throws Exception {
+        // Given
         UUID id = UUID.fromString("44444444-4444-4444-4444-444444444441");
         Mockito.when(currentUserProvider.getCurrentUserId()).thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult result = mockMvc.perform(patch("/api/v1/transactions/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))).andReturn();
 
+        // Then
         Assertions.assertThat(result.getResponse().getStatus()).isEqualTo(400);
         var transaction = transactionRepository.findById(id).orElseThrow();
         Assertions.assertThat(transaction.getAmount()).isEqualByComparingTo("100000.00");
@@ -79,8 +83,9 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Обновлние транзакции: успешно")
+    @DisplayName("Обновление транзакции: успешно")
     public void updateTransactionSimpleFieldsTest() {
+        // Given
         UUID transactionId = UUID.fromString("44444444-4444-4444-4444-444444444441");
 
         UpdateTransactionRequestDto requestDto = UpdateTransactionRequestDto.builder()
@@ -92,12 +97,14 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(patch("/api/v1/transactions/{id}", transactionId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         TransactionResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -122,8 +129,9 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Обновлние транзакции: успешное обновление связанных сущностей")
+    @DisplayName("Обновление категории транзакции")
     public void updateTransactionForeignKeysTest() {
+        // Given
         UUID transactionId = UUID.fromString("44444444-4444-4444-4444-444444444441");
         UUID newCategoryId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
@@ -134,12 +142,14 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(patch("/api/v1/transactions/{id}", transactionId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         TransactionResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -161,8 +171,9 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @SneakyThrows
-    @DisplayName("Обновлние транзакции: попытка обновить несуществующую или удаленную транзакцию")
+    @DisplayName("Обновление транзакции: ошибка 404")
     public void updateTransactionNotFoundTest() {
+        // Given
         UUID deletedTransactionId = UUID.fromString("44444444-4444-4444-4444-444444444444");
 
         UpdateTransactionRequestDto requestDto = UpdateTransactionRequestDto.builder()
@@ -172,12 +183,14 @@ public class UpdateTransactionServiceImplIntegrationTest extends AbstractIntegra
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(patch("/api/v1/transactions/{id}", deletedTransactionId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NOT_FOUND.value());
     }

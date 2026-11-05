@@ -50,7 +50,9 @@ public class AggregateRatesCurrencyRateServiceImplIntegrationTest extends Abstra
     @ParameterizedTest
     @ValueSource(ints = {1, 10, 100})
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert_currency.sql"})
+    @DisplayName("Повторная загрузка обновляет курс")
     void persistsNominalAndResponseDateAndUpdatesSameQuote(int nominal) throws Exception {
+        // Given
         String xml = CbrApiDataFactory.cbrFeignClientResponse.replace("<Nominal>1</Nominal>",
                 "<Nominal>" + nominal + "</Nominal>");
         WireMock.stubFor(get(urlPathEqualTo("/XML_daily.asp"))
@@ -59,13 +61,16 @@ public class AggregateRatesCurrencyRateServiceImplIntegrationTest extends Abstra
                         .withBody(xml)));
 
         currencyRateService.aggregateRates();
+
         var original = currencyRateRepository.findAll().getFirst();
         WireMock.stubFor(get(urlPathEqualTo("/XML_daily.asp"))
                 .willReturn(aResponse().withStatus(200)
                         .withHeader("Content-Type", "application/xml; charset=windows-1251")
                         .withBody(xml.replace("89,5012", "91,2500"))));
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         var saved = currencyRateRepository.findAll();
         Assertions.assertThat(saved).hasSize(1);
         Assertions.assertThat(saved.getFirst().getId()).isEqualTo(original.getId());
@@ -86,7 +91,9 @@ public class AggregateRatesCurrencyRateServiceImplIntegrationTest extends Abstra
 
     @Test
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert_currency.sql"})
+    @DisplayName("Блокировка исключает повторный запуск")
     void schedulerUsesDatabaseLockAndSkipsSecondInvocation() {
+        // Given
         jdbcTemplate.update("DELETE FROM shedlock WHERE name = ?", "currency-rates");
         WireMock.resetAllRequests();
         WireMock.stubFor(get(urlPathEqualTo("/XML_daily.asp"))
@@ -94,9 +101,11 @@ public class AggregateRatesCurrencyRateServiceImplIntegrationTest extends Abstra
                         .withHeader("Content-Type", "application/xml; charset=windows-1251")
                         .withBody(CbrApiDataFactory.cbrFeignClientResponse)));
 
+        // When
         scheduler.scheduleCurrencySync();
         scheduler.scheduleCurrencySync();
 
+        // Then
         WireMock.verify(1, WireMock.getRequestedFor(urlPathEqualTo("/XML_daily.asp")));
         Assertions.assertThat(currencyRateRepository.findAll()).hasSize(1);
         Assertions.assertThat(jdbcTemplate.queryForObject(
@@ -112,8 +121,9 @@ public class AggregateRatesCurrencyRateServiceImplIntegrationTest extends Abstra
             },
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
-    @DisplayName("Интеграционный тест: успешная агрегация курсов валют")
+    @DisplayName("Агрегация курсов: успешно")
     public void aggregateRatesSuccessfully() {
+        // Given
         String xmlResponse = CbrApiDataFactory.cbrFeignClientResponse;
 
         WireMock.stubFor(get(urlPathEqualTo("/XML_daily.asp"))
@@ -122,8 +132,10 @@ public class AggregateRatesCurrencyRateServiceImplIntegrationTest extends Abstra
                         .withHeader("Content-Type", "application/xml; charset=windows-1251")
                         .withBody(xmlResponse)));
 
+        // When
         currencyRateService.aggregateRates();
 
+        // Then
         List<CurrencyRate> savedRates = currencyRateRepository.findAll();
 
         Assertions.assertThat(savedRates).hasSize(1);

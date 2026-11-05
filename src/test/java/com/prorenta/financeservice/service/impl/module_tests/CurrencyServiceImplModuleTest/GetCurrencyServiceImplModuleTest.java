@@ -59,16 +59,19 @@ public class GetCurrencyServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение списка валют: успешно")
     public void getCurrenciesSuccessfully() {
+        // Given
         Currency currency = CurrencyDataFactory.createDefaultCurrency();
 
         Mockito.when(currencyRepository.findAllActiveCurrencies())
                 .thenReturn(List.of(currency));
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         ListCurrenciesResponseDto actual = objectMapper.readValue(
@@ -90,14 +93,17 @@ public class GetCurrencyServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение списка валют: пустой список")
     public void getCurrenciesEmptyList() {
+        // Given
         Mockito.when(currencyRepository.findAllActiveCurrencies())
                 .thenReturn(List.of());
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         ListCurrenciesResponseDto actual = objectMapper.readValue(
@@ -116,17 +122,20 @@ public class GetCurrencyServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение валюты по ID: успешно")
     public void getCurrencyByIdSuccessfully() {
+        // Given
         Currency currency = CurrencyDataFactory.createDefaultCurrency();
         UUID currencyId = currency.getId();
 
         Mockito.when(currencyRepository.findById(Mockito.any(UUID.class)))
                 .thenReturn(Optional.of(currency));
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies/{currencyId}", currencyId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         CurrencyResponseDto actual = objectMapper.readValue(
@@ -148,6 +157,7 @@ public class GetCurrencyServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение валюты по ID: валюта не найдена")
     public void getCurrencyByIdNotFound() {
+        // Given
         UUID currencyId = UUID.randomUUID();
         String message = "Валюта с id=" + currencyId + " не найдена";
 
@@ -159,11 +169,13 @@ public class GetCurrencyServiceImplModuleTest {
                 .message(message)
                 .build();
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies/{currencyId}", currencyId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         ErrorDto actual = objectMapper.readValue(
@@ -182,13 +194,16 @@ public class GetCurrencyServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение валюты по ID: ошибка 400")
     public void getCurrencyByIdInvalidUuidFormat() {
+        // Given
         String invalidUuid = "12345-invalid-string";
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies/{currencyId}", invalidUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 

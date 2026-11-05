@@ -40,11 +40,15 @@ public class GetCurrencyServiceImplIntegrationTest extends AbstractIntegrationTe
     @SneakyThrows
     @DisplayName("Получение валюты: успешное получение активных валют")
     public void getActiveCurrenciesTest() {
+        // Given: данные подготовлены конфигурацией теста
+
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         ListCurrenciesResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -69,13 +73,16 @@ public class GetCurrencyServiceImplIntegrationTest extends AbstractIntegrationTe
     @SneakyThrows
     @DisplayName("Получение валюты: успешное получение валюты по ID")
     public void getCurrencyByIdTest() {
+        // Given
         UUID currencyId = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies/{id}", currencyId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         CurrencyResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -92,13 +99,16 @@ public class GetCurrencyServiceImplIntegrationTest extends AbstractIntegrationTe
     @SneakyThrows
     @DisplayName("Получение валюты: получение несуществующей валюты")
     public void getCurrencyByIdNotFoundTest() {
+        // Given
         UUID unknownCurrencyId = UUID.randomUUID();
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/currencies/{id}", unknownCurrencyId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         ErrorDto actualError = objectMapper.readValue(
                 responseContent,

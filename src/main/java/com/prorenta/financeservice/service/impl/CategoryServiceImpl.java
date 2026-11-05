@@ -33,7 +33,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public Category findAvailableCategoryById(UUID id) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Получение категории: categoryId={}, userId={}", id, userId);
+
         return categoryRepository.findByIdAndUserIdAndIsDeletedFalse(id, userId).orElseThrow(
                 () -> new CategoryNotFoundException("Категория с id=" + id + " не найдена")
         );
@@ -43,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponseDto createCategory(CreateCategoryRequestDto dto) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Создание категории: userId={}", userId);
 
         if (categoryRepository.countLimitByUserId(userId) >= CATEGORY_LIMIT) {
@@ -56,7 +59,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
 
         Category savedCategory = categoryRepository.save(category);
+
         log.info("Категория успешно сохранена: categoryId={}, userId={}", savedCategory.getId(), userId);
+
         return categoryMapper.mapCategoryToCategoryResponseDto(savedCategory);
     }
 
@@ -64,9 +69,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public GetAllCategoriesResponseDto getCurrentUserCategories() {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Получение списка категорий: userId={}", userId);
+
         List<Category> categories = categoryRepository.findAllByUserId(userId);
+
         log.debug("Категории успешно найдены: count={}, userId={}", categories.size(), userId);
+
         return GetAllCategoriesResponseDto.builder()
                 .categories(categories.stream()
                         .map(categoryMapper::mapCategoryToCategoryResponseDto)
@@ -78,10 +87,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void softRemoveCategory(UUID categoryId) {
         UUID userId = currentUserProvider.getCurrentUserId();
+
         log.debug("Удаление категории: categoryId={}, userId={}", categoryId, userId);
+
         if (categoryRepository.softRemoveCategoryById(categoryId, userId) == 0) {
             throw new CategoryNotFoundException("Категория с id=" + categoryId + " не найдена");
         }
+
         log.info("Успешное удаление категории: categoryId={}, userId={}", categoryId, userId);
     }
 }

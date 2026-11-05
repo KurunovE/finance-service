@@ -33,7 +33,6 @@ import java.util.UUID;
 )
 public class CreateCategoryServiceImplUnitTest {
 
-
     @Autowired
     private CategoryService categoryService;
 
@@ -46,6 +45,7 @@ public class CreateCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Создание категории: успешно")
     public void createCategorySuccessfulTest() {
+        // Given
         UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
         CreateCategoryRequestDto requestDto = createDefaultCategoryRequestDto();
         Category expectedCategory = createDefaultCategory(userId);
@@ -57,8 +57,10 @@ public class CreateCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.save(Mockito.any(Category.class)))
                 .thenReturn(expectedCategory);
 
+        // When
         CategoryResponseDto actual = categoryService.createCategory(requestDto);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(expectedCategory.getId(), actual.id());
         Assertions.assertEquals(expectedCategory.getName(), actual.name());
@@ -68,6 +70,7 @@ public class CreateCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Создание категории: ошибка превышения лимита")
     public void createCategoryLimitExceededTest() {
+        // Given
         UUID userId = UserInfoDataFactory.DEFAULT_USER_ID;
         CreateCategoryRequestDto requestDto = createDefaultCategoryRequestDto();
 
@@ -76,11 +79,13 @@ public class CreateCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.countLimitByUserId(userId))
                 .thenReturn(31);
 
+        // When
         LimitExceededException thrown = Assertions.assertThrows(
                 LimitExceededException.class,
                 () -> categoryService.createCategory(requestDto)
         );
 
+        // Then
         Assertions.assertNotNull(thrown.getMessage());
 
         Mockito.verify(categoryRepository, Mockito.never()).save(Mockito.any(Category.class));

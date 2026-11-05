@@ -39,13 +39,16 @@ public class FindCurrencyServiceImplUnitTest {
     @Test
     @DisplayName("Поиск валюты по id: успешно")
     public void findCurrencyByIdSuccessfulTest() {
+        // Given
         Currency expected = createDefaultCurrency();
 
         Mockito.when(currencyRepository.findById(Mockito.any(UUID.class)))
                 .thenReturn(Optional.ofNullable(expected));
 
+        // When
         Currency actual = currencyService.findById(DEFAULT_CURRENCY_ID);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(DEFAULT_CURRENCY_ID, actual.getId());
         Assertions.assertEquals(expected, actual);
@@ -54,6 +57,7 @@ public class FindCurrencyServiceImplUnitTest {
     @Test
     @DisplayName("Поиск валюты по id: валюта не найдена")
     public void findCurrencyByIdCurrencyNotFoundTest() {
+        // Given
         String message = "Валюта с id=" + DEFAULT_CURRENCY_ID + " не найдена";
 
         Mockito.when(currencyRepository.findById(Mockito.any(UUID.class)))
@@ -61,11 +65,13 @@ public class FindCurrencyServiceImplUnitTest {
                         "Валюта с id=" + DEFAULT_CURRENCY_ID + " не найдена"
                 ));
 
+        // When
         CurrencyNotFoundException thrown = Assertions.assertThrows(
                 CurrencyNotFoundException.class,
                 () -> currencyService.findById(DEFAULT_CURRENCY_ID)
         );
 
+        // Then
         Assertions.assertEquals(message, thrown.getMessage());
     }
 }

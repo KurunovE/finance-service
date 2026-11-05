@@ -40,6 +40,7 @@ public class RemoveCategoryServiceImplUnitTest {
     @Test
     @DisplayName("Мягкое удаление категории: успешно")
     public void softRemoveCategorySuccessfulTest() {
+        // Given
         UUID categoryId = DEFAULT_CATEGORY_ID;
 
         Mockito.when(currentUserProvider.getCurrentUserId())
@@ -47,8 +48,10 @@ public class RemoveCategoryServiceImplUnitTest {
         Mockito.when(categoryRepository.softRemoveCategoryById(categoryId, currentUserProvider.getCurrentUserId()))
                 .thenReturn(1);
 
+        // When
         categoryService.softRemoveCategory(categoryId);
 
+        // Then
         Mockito.verify(categoryRepository, Mockito.times(1))
                 .softRemoveCategoryById(categoryId, currentUserProvider.getCurrentUserId());
     }

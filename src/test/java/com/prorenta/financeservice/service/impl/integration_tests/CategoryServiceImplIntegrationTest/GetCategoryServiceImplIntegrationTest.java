@@ -40,14 +40,17 @@ public class GetCategoryServiceImplIntegrationTest extends AbstractIntegrationTe
     @SneakyThrows
     @DisplayName("Получение категории: успешно")
     public void getAllCategoriesByUserIdTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         GetAllCategoriesResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -73,16 +76,19 @@ public class GetCategoryServiceImplIntegrationTest extends AbstractIntegrationTe
     @SneakyThrows
     @DisplayName("Получение категории: пустой список")
     public void getAllCategoriesForUnknownUserTest() {
+        // Given
         UUID unknownUserId = UUID.randomUUID();
 
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(unknownUserId);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         GetAllCategoriesResponseDto actual = objectMapper.readValue(
                 responseContent,
@@ -98,18 +104,21 @@ public class GetCategoryServiceImplIntegrationTest extends AbstractIntegrationTe
 
     @Test
     @SneakyThrows
-    @DisplayName("Получение категорий: старый маршрут выбора пользователя недоступен")
+    @DisplayName("Старый маршрут категорий недоступен")
     public void cannotSelectUserThroughLegacyCategoryRoute() {
+        // Given
         String invalidUuid = "not-a-valid-uuid";
 
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/categories/{userId}", invalidUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.METHOD_NOT_ALLOWED.value());
     }

@@ -29,6 +29,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Cacheable(value = "currency_entity_by_id", key = "#id")
     public Currency findById(UUID id) {
         log.debug("Поиск валюты: currencyId={}", id);
+
         return currencyRepository.findById(id).orElseThrow(
                 () -> new CurrencyNotFoundException("Валюта с id=" + id + " не найдена")
         );
@@ -39,10 +40,13 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Cacheable(value = "currency_dto_by_id", key = "#currencyId")
     public CurrencyResponseDto getCurrency(UUID currencyId) {
         log.debug("Получение валюты: currencyId={}", currencyId);
+
         Currency currency = currencyRepository.findById(currencyId).orElseThrow(
                 () -> new CurrencyNotFoundException("Валюта с id=" + currencyId + " не найдена")
         );
+
         log.debug("Валюта успешно получена: currencyId={}", currency.getId());
+
         return currencyMapper.mapCurrencyToCurrencyResponseDto(currency);
     }
 
@@ -51,8 +55,11 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Cacheable(value = "all_currencies")
     public ListCurrenciesResponseDto getCurrencies() {
         log.debug("Получение списка всех валют");
+
         List<Currency> currencyList = currencyRepository.findAllActiveCurrencies();
+
         log.debug("Список валют получен: size={}", currencyList.size());
+
         return ListCurrenciesResponseDto.builder()
                 .currencies(
                         currencyList.stream()
@@ -67,6 +74,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Cacheable(value = "currencies_by_code", key = "#code")
     public Currency findByCode(String code) {
         log.debug("Поиск валюты: code={}", code);
+
         return currencyRepository.findByCode(code)
                 .orElseThrow(() -> new CurrencyNotFoundException("Валюта с code=" + code + " не найдена"));
     }

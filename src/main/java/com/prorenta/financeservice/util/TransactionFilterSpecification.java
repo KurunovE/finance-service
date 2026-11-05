@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class TransactionFilterSpecification {
+
     public static Specification<Transaction> buildFilter(
             UUID userId,
             String categoryName,
@@ -30,6 +31,7 @@ public class TransactionFilterSpecification {
             if (startCreatedDate != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), startCreatedDate));
             }
+
             if (endCreatedDate != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdDate"), endCreatedDate));
             }

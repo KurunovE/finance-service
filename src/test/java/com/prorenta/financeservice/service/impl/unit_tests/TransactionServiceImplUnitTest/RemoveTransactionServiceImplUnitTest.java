@@ -46,14 +46,17 @@ public class RemoveTransactionServiceImplUnitTest {
     @Test
     @DisplayName("Удаление транзакции: успешно")
     public void softRemoveTransactionSuccessfulTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
         UUID transactionId = UUID.randomUUID();
         Mockito.when(transactionRepository.softRemoveTransaction(transactionId, currentUserProvider.getCurrentUserId())).thenReturn(1);
 
+        // When
         transactionService.softRemoveTransaction(transactionId);
 
+        // Then
         Mockito.verify(transactionRepository, Mockito.times(1))
                 .softRemoveTransaction(transactionId, currentUserProvider.getCurrentUserId());
     }

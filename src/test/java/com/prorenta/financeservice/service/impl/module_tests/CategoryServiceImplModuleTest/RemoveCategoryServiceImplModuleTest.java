@@ -50,6 +50,7 @@ public class RemoveCategoryServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Мягкое удаление категории: успешно")
     public void softRemoveCategorySuccessfully() {
+        // Given
         UUID categoryId = CategoryDataFactory.DEFAULT_CATEGORY_ID;
 
         Mockito.when(currentUserProvider.getCurrentUserId())
@@ -58,11 +59,13 @@ public class RemoveCategoryServiceImplModuleTest {
         Mockito.when(categoryRepository.softRemoveCategoryById(categoryId, currentUserProvider.getCurrentUserId()))
                 .thenReturn(1);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(delete("/api/v1/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NO_CONTENT.value());
 
@@ -73,16 +76,19 @@ public class RemoveCategoryServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Мягкое удаление категории: ошибка 400")
     public void softRemoveCategoryInvalidUuidFormat() {
+        // Given
         String invalidCategoryId = "invalid-uuid-string";
 
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(delete("/api/v1/categories/{id}", invalidCategoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 

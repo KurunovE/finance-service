@@ -62,6 +62,7 @@ public class GetTransactionServiceImplUnitTest {
     @Test
     @DisplayName("Получение транзакции: успешно")
     public void getTransactionsSuccessfulTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -84,8 +85,10 @@ public class GetTransactionServiceImplUnitTest {
         Mockito.when(transactionRepository.findAll(Mockito.<Specification<Transaction>>any(), Mockito.any(Pageable.class)))
                 .thenReturn(pageResponse);
 
+        // When
         FilterTransactionsResponseDto actual = transactionService.getTransactions(filterDto);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(1, actual.countTransactions());
         Assertions.assertEquals(1, actual.countPage());
@@ -96,6 +99,7 @@ public class GetTransactionServiceImplUnitTest {
     @Test
     @DisplayName("Получение транзакций: пустой список")
     public void getTransactionsEmptyListTest() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
@@ -113,8 +117,10 @@ public class GetTransactionServiceImplUnitTest {
         Mockito.when(transactionRepository.findAll(Mockito.<Specification<Transaction>>any(), Mockito.any(Pageable.class)))
                 .thenReturn(emptyPage);
 
+        // When
         FilterTransactionsResponseDto actual = transactionService.getTransactions(filterDto);
 
+        // Then
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(0, actual.countTransactions());
         Assertions.assertEquals(0, actual.countPage());

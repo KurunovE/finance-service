@@ -46,6 +46,7 @@ public class CreateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @SneakyThrows
     @DisplayName("Создание транзакции: успешно")
     public void createTransactionSuccessfulTest() {
+        // Given
         UUID categoryId = CategoryDataFactory.DEFAULT_CATEGORY_ID;
         UUID currencyId = CurrencyDataFactory.DEFAULT_CURRENCY_ID;
 
@@ -61,12 +62,14 @@ public class CreateTransactionServiceImplIntegrationTest extends AbstractIntegra
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         TransactionResponseDto actual = objectMapper.readValue(
@@ -96,6 +99,7 @@ public class CreateTransactionServiceImplIntegrationTest extends AbstractIntegra
     @SneakyThrows
     @DisplayName("Создание транзакции: отсутствует профиль текущего пользователя")
     public void createTransactionMissingUserProfileTest() {
+        // Given
         UUID categoryId = CategoryDataFactory.DEFAULT_CATEGORY_ID;
         UUID currencyId = CurrencyDataFactory.DEFAULT_CURRENCY_ID;
 
@@ -111,12 +115,14 @@ public class CreateTransactionServiceImplIntegrationTest extends AbstractIntegra
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenThrow(new com.prorenta.financeservice.exception.UserNotFoundException("Профиль пользователя не найден"));
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/transactions")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.NOT_FOUND.value());
     }

@@ -74,6 +74,7 @@ public class UpdateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Обновление транзакции: успешно (HTTP 200)")
     public void updateTransactionSuccessfully() {
+        // Given
         UUID transactionId = UUID.randomUUID();
         UserInfoDto userInfo = UserInfoDataFactory.createDefaultUserInfoDto();
         Category category = CategoryDataFactory.createDefaultCategory(userInfo.userId());
@@ -99,12 +100,14 @@ public class UpdateTransactionServiceImplModuleTest {
         Mockito.when(transactionRepository.save(Mockito.any(Transaction.class)))
                 .thenReturn(updatedTransaction);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(patch("/api/v1/transactions/{id}", transactionId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         TransactionResponseDto actual = objectMapper.readValue(responseContent, TransactionResponseDto.class);
 
@@ -120,6 +123,7 @@ public class UpdateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Обновление транзакции: транзакция не найдена (HTTP 404)")
     public void updateTransactionNotFound() {
+        // Given
         UUID transactionId = UUID.randomUUID();
         UpdateTransactionRequestDto requestDto = UpdateTransactionRequestDto.builder().build();
         String errorMessage = "Транзакция с id=" + transactionId + " не найдена";
@@ -129,12 +133,14 @@ public class UpdateTransactionServiceImplModuleTest {
         Mockito.when(transactionRepository.findActiveTransactionByIdAndUserId(transactionId, currentUserProvider.getCurrentUserId()))
                 .thenThrow(new TransactionNotFoundException(errorMessage));
 
+        // When
         MvcResult mvcResult = mockMvc.perform(patch("/api/v1/transactions/{id}", transactionId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         ErrorDto actualError = objectMapper.readValue(responseContent, ErrorDto.class);
 
@@ -148,15 +154,18 @@ public class UpdateTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Обновление транзакции: ошибка 400 (Невалидный формат UUID)")
     public void updateTransactionInvalidUuidFormat() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(patch("/api/v1/transactions/{id}", "invalid-uuid")
                         .content("{}")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 

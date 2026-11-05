@@ -27,6 +27,7 @@ public class CbrFeignClientIntegrationTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Получение курсов валют: успешно")
     public void testGetDailyRatesParsesXmlSuccessfully() {
+        // Given
         String xmlResponse = CbrApiDataFactory.cbrFeignClientResponse;
 
         WireMock.stubFor(get(urlPathEqualTo("/XML_daily.asp"))
@@ -35,8 +36,10 @@ public class CbrFeignClientIntegrationTest extends AbstractIntegrationTest {
                         .withHeader("Content-Type", "application/xml; charset=windows-1251")
                         .withBody(xmlResponse)));
 
+        // When
         ValCursResponseDto response = cbrFeignClient.getDailyRates(null);
 
+        // Then
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.date()).isEqualTo("01.09.2026");
         Assertions.assertThat(response.currencies().getFirst().nominal()).isEqualTo(1);

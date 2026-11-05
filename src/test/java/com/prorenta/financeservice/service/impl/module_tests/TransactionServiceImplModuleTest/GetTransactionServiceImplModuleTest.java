@@ -74,6 +74,7 @@ public class GetTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение списка транзакций: успешно (HTTP 200)")
     public void getTransactionsSuccessfully() {
+        // Given
         UserInfoDto userInfoDto = UserInfoDataFactory.createDefaultUserInfoDto();
         Category category = CategoryDataFactory.createDefaultCategory(userInfoDto.userId());
         Currency currency = CurrencyDataFactory.createDefaultCurrency();
@@ -86,6 +87,7 @@ public class GetTransactionServiceImplModuleTest {
         Mockito.when(transactionRepository.findAll(Mockito.<Specification<Transaction>>any(), Mockito.any(Pageable.class)))
                 .thenReturn(page);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("page", "0")
                         .param("pageSize", "10")
@@ -95,6 +97,7 @@ public class GetTransactionServiceImplModuleTest {
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         FilterTransactionsResponseDto actual = objectMapper.readValue(responseContent, FilterTransactionsResponseDto.class);
 
@@ -115,6 +118,7 @@ public class GetTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение списка транзакций: пустой список (HTTP 200)")
     public void getTransactionsEmptyList() {
+        // Given
         Page<Transaction> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
 
         Mockito.when(currentUserProvider.getCurrentUserId())
@@ -122,11 +126,13 @@ public class GetTransactionServiceImplModuleTest {
         Mockito.when(transactionRepository.findAll(Mockito.<Specification<Transaction>>any(), Mockito.any(Pageable.class)))
                 .thenReturn(emptyPage);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         String responseContent = mvcResult.getResponse().getContentAsString();
         FilterTransactionsResponseDto actual = objectMapper.readValue(responseContent, FilterTransactionsResponseDto.class);
 
@@ -144,9 +150,11 @@ public class GetTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение списка транзакций: ошибка валидации DTO")
     public void getTransactionsWithValidationException() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("sortDirection", "INVALID_DIR")
                         .param("fieldSort", "INVALID_FIELD")
@@ -154,6 +162,7 @@ public class GetTransactionServiceImplModuleTest {
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 
@@ -164,9 +173,11 @@ public class GetTransactionServiceImplModuleTest {
     @SneakyThrows
     @DisplayName("Получение списка транзакций: невалидный период дат")
     public void getTransactionsWithInvalidPeriod() {
+        // Given
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/transactions")
                         .param("startCreatedDate", "2026-10-01")
                         .param("endCreatedDate", "2026-09-01")
@@ -174,6 +185,7 @@ public class GetTransactionServiceImplModuleTest {
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
 

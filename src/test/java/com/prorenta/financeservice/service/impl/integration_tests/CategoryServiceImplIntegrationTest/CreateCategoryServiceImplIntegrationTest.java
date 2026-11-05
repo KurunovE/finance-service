@@ -39,6 +39,7 @@ public class CreateCategoryServiceImplIntegrationTest extends AbstractIntegratio
     @SneakyThrows
     @DisplayName("Создание категории: дубликат категории")
     public void createCategoryDuplicateNameTest() {
+        // Given
         CreateCategoryRequestDto requestDto = CreateCategoryRequestDto.builder()
                 .name("Продукты")
                 .type(CategoryType.EXPENSE)
@@ -47,12 +48,14 @@ public class CreateCategoryServiceImplIntegrationTest extends AbstractIntegratio
         Mockito.when(currentUserProvider.getCurrentUserId())
                 .thenReturn(UserInfoDataFactory.DEFAULT_USER_ID);
 
+        // When
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/categories")
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
                 .andReturn();
 
+        // Then
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(HttpStatus.CONFLICT.value());
     }

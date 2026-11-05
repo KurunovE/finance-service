@@ -26,5 +26,4 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected MockMvc mockMvc;
-
 }
